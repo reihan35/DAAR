@@ -271,6 +271,9 @@ public class RegEx {
     }
  }
 
+
+//Class pour gérér les automates finies avec des epsilon transition
+
 class NFA {
   protected ArrayList<Integer> q = new ArrayList<Integer>();
   protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
@@ -316,27 +319,16 @@ class NFA {
     Transitions.put(s1,tmp);
   }
 
-   public static int removeDuplicateElements(int arr[], int n){  
-        if (n==0 || n==1){  
-            return n;  
-        }    
-        int j = 0;//for next element  
-        for (int i=0; i < n-1; i++){  
-            if (arr[i] != arr[i+1]){  
-                arr[j++] = arr[i];  
-            }  
-        }  
-        arr[j++] = arr[n-1];  
-        return j;  
-    }  
-       
-
   public NFA concaten(NFA A2){
-    q.addAll(A2.q); //On rajoute les étas de A2
+    q.addAll(A2.q); //On rajoute les étas de A2 
     set_transitions(0,f,A2.q0); 
     f = A2.f; //L'état final est celui du deuxieme
     Sigma.add(0) ;
-    Sigma.addAll(A2.Sigma);
+    for(int i : A2.Sigma){
+      if (Sigma.contains(i) == false){
+        Sigma.add(i);
+      }
+    }
     //HashSet<Integer> Set = new HashSet<>( Arrays.asList(Sigma));     
     return new NFA(q,Sigma,q0,f,Transitions);
   }
@@ -351,8 +343,9 @@ class NFA {
     }
     q.add(r1);
     q.add(r2);
-    Sigma.add(0) ;
-    System.out.println("yo");
+     if (Sigma.contains(0) == false){
+        Sigma.add(0);
+    }
     set_transitions(0,r1,q0);
     set_transitions(0,f,r2);
     set_transitions(0,r1,r2);
@@ -373,8 +366,14 @@ class NFA {
     q.add(r1);
     q.add(r2);
     q.addAll(A2.q);
-    Sigma.add(0);
-    Sigma.addAll(A2.Sigma);
+    if (Sigma.contains(0) == false){
+        Sigma.add(0);
+    }
+    for(int i : A2.Sigma){
+      if (Sigma.contains(i) == false){
+        Sigma.add(i);
+      }
+    }
     set_transitions(0,r1,q0);
     set_transitions(0,r1,A2.q0);
     set_transitions(0,f,r2);
@@ -446,6 +445,9 @@ class RegExTree {
       r1 = rand.nextInt(100);
       r2 = rand.nextInt(100);
     }
+
+    //Si on est là c'est qu'on tombe les feuilles de l'arbre (des lettre)
+
     Q.add(r1);
     Q.add(r2);
     ArrayList<Integer> Sigma = new ArrayList<Integer>();
