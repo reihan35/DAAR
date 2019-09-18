@@ -2,6 +2,10 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Exception;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.HashSet;
+
 
 public class RegEx {
   //MACROS
@@ -58,6 +62,7 @@ public class RegEx {
       /*try {*/
         RegExTree ret = parse();
         System.out.println("  >> Tree result: "+ret.toString()+".");
+        System.out.println("  >> Here is the NFA of the tree : ");
         ret.toAutomaton().print();
       /*} catch (Exception e) {
         System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
@@ -303,49 +308,106 @@ class NFA {
 
   public void set_transitions(int t,int s1,int s2){
     Tuple tu = new Tuple(s2,t);
-    ArrayList<Tuple> m = Transitions.get(s1);
-    m.add(tu);
-    Transitions.put(s1,m);
-  }
-
-  public NFA concaten(NFA A2){
-    q.addAll(A2.q); //On rajoute les étas de A2
-    ArrayList<Tuple> tmp = Transitions.get(f);
+    ArrayList<Tuple> tmp = Transitions.get(s1);
     if (tmp == null){
       tmp = new ArrayList<Tuple>();
     }
-    tmp.add(new Tuple(A2.q0,0)); //0 est equivalent de l'epsilon
-    Transitions.put(f,tmp);
+    tmp.add(tu);
+    Transitions.put(s1,tmp);
+  }
+
+   public static int removeDuplicateElements(int arr[], int n){  
+        if (n==0 || n==1){  
+            return n;  
+        }    
+        int j = 0;//for next element  
+        for (int i=0; i < n-1; i++){  
+            if (arr[i] != arr[i+1]){  
+                arr[j++] = arr[i];  
+            }  
+        }  
+        arr[j++] = arr[n-1];  
+        return j;  
+    }  
+       
+
+  public NFA concaten(NFA A2){
+    q.addAll(A2.q); //On rajoute les étas de A2
+    set_transitions(0,f,A2.q0); 
     f = A2.f; //L'état final est celui du deuxieme
     Sigma.add(0) ;
     Sigma.addAll(A2.Sigma);
+    //HashSet<Integer> Set = new HashSet<>( Arrays.asList(Sigma));     
     return new NFA(q,Sigma,q0,f,Transitions);
   }
 
-  /*public NFA etoil(){
-
+  public NFA etoil(){
+    int r1 = 0;
+    int r2 = 0; 
+    while(r1==r2){
+      Random rand = new Random();
+      r1 = rand.nextInt(100);
+      r2 = rand.nextInt(100);
+    }
+    q.add(r1);
+    q.add(r2);
+    Sigma.add(0) ;
+    System.out.println("yo");
+    set_transitions(0,r1,q0);
+    set_transitions(0,f,r2);
+    set_transitions(0,r1,r2);
+    set_transitions(0,f,q0);
+    f = r2;
+    q0 = r1;
+    return new NFA(q,Sigma,q0,f,Transitions);
   }
 
   public NFA altern(NFA A2){
-
-  }*/
+    int r1 = 0;
+    int r2 = 0; 
+    while(r1==r2){
+      Random rand = new Random();
+      r1 = rand.nextInt(100);
+      r2 = rand.nextInt(100);
+    }
+    q.add(r1);
+    q.add(r2);
+    q.addAll(A2.q);
+    Sigma.add(0);
+    Sigma.addAll(A2.Sigma);
+    set_transitions(0,r1,q0);
+    set_transitions(0,r1,A2.q0);
+    set_transitions(0,f,r2);
+    set_transitions(0,A2.f,r2);
+    q0 = r1;
+    f = r2;
+    return new NFA(q,Sigma,q0,f,Transitions);
+  }
+  
 
   public void print_transitions(){
     for (int key: this.Transitions.keySet()){
       ArrayList<Tuple> value = Transitions.get(key);
-      System.out.print(key + ": ");  
+      System.out.print("  " +key + ": ");  
         for (Tuple t : value) {
-          System.out.println(t.toString());
+          System.out.print(t.toString() + ", ");
        }
+       System.out.println();
     } 
+    System.out.println("}");
   }
 
 
   public void print(){
-    System.out.println("Q :" + this.getQ());
-    System.out.println("Sigma :" + Sigma);
-    System.out.println("Q0 :" + q0);
-    System.out.println("F :" + f);
+    System.out.println("{  Q :" + this.getQ());
+    //System.out.println("  Sigma :" + Sigma);
+    System.out.println("  Q0 :" + q0);
+    System.out.println("  F :" + f);
+    System.out.print("  Sigma : { ");
+    for (int i : Sigma){
+      System.out.print( Character.toString((char)i) + " ");
+    }
+    System.out.println("} ");
     print_transitions();
   }
 }
@@ -362,45 +424,39 @@ class RegExTree {
   //FROM TREE TO PARENTHESIS
 	
   public NFA toAutomaton() {
-    /*if (root!=RegEx.CONCAT && root!=RegEx.ETOILE && root==RegEx.ALTERN && root==RegEx.DOT) {
-      ArrayList<Integer> Q = new ArrayList<Integer>();
-      Q.add(0);
-      Q.add(1);
-      ArrayList<Integer> Sigma = new ArrayList<Integer>();
-      Sigma.add(root);
-      Tuple ti = new Tuple(1,root);
-      ArrayList<Tuple> t = new ArrayList<Tuple>();
-      t.add(ti);
-      HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
-      Transitions.put(0,t);
-      NFA n = new NFA(Q,Sigma,0,1,Transitions);
-      return n;
-    }*/
 
     if (root==RegEx.CONCAT) {
       return subTrees.get(0).toAutomaton().concaten(subTrees.get(1).toAutomaton());
     }
 
-      ArrayList<Integer> Q = new ArrayList<Integer>();
-      Q.add(0);
-      Q.add(1);
-      ArrayList<Integer> Sigma = new ArrayList<Integer>();
-      Sigma.add(root);
-      Tuple ti = new Tuple(1,root);
-      ArrayList<Tuple> t = new ArrayList<Tuple>();
-      t.add(ti);
-      HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
-      Transitions.put(0,t);
-      NFA n = new NFA(Q,Sigma,0,1,Transitions);
-      return n;
 
-    /*if (root==RegEx.ETOILE) {
+    if (root==RegEx.ETOILE) {
       return subTrees.get(0).toAutomaton().etoil();
     }
 
-     if (root==RegEx.ALTERN) {
+    if (root==RegEx.ALTERN) {
       return subTrees.get(0).toAutomaton().altern(subTrees.get(1).toAutomaton());
-    }*/
+    }
+
+    ArrayList<Integer> Q = new ArrayList<Integer>();
+    int r1 = 0;
+    int r2 = 0; 
+    while(r1==r2){
+      Random rand = new Random();
+      r1 = rand.nextInt(100);
+      r2 = rand.nextInt(100);
+    }
+    Q.add(r1);
+    Q.add(r2);
+    ArrayList<Integer> Sigma = new ArrayList<Integer>();
+    Sigma.add(root);
+    Tuple ti = new Tuple(r2,root);
+    ArrayList<Tuple> t = new ArrayList<Tuple>();
+    t.add(ti);
+    HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
+    Transitions.put(r1,t);
+    NFA n = new NFA(Q,Sigma,r1,r2,Transitions);
+    return n;
   }
 
   public String toString() {
