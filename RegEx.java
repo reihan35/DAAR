@@ -627,19 +627,6 @@ class DFA {
     this.Transitions = Transitions;
   }
   
-  /*public void print_transitions(){
-    for (int key: this.Transitions.keySet()){
-      ArrayList<Tuple> value = Transitions.get(key);
-      System.out.print("  " +key + ": ");  
-        for (Tuple t : value) {
-          System.out.print(t.toString() + ", ");
-       }
-       System.out.println();
-    } 
-    System.out.println("}");
-  }*/
-
-
   public void print(){
     System.out.println("{  Q :" + q);
     //System.out.println("  Sigma :" + Sigma);
