@@ -127,7 +127,7 @@ public class RegEx {
       for (int i=1;i<regEx.length();i++) System.out.print(","+(int)regEx.charAt(i));
       System.out.println("].");
       try {
-        RegExTree ret = parse();
+        RegExTree retext + DFAtext + DFAtext + DFAtext + DFAt = parse();
         System.out.println("  >> Tree result: "+ret.toString()+".");
         System.out.println("  >> Here is the NFA of the tree : ");
         ret.toAutomaton().print();
@@ -553,35 +553,24 @@ class NFA {
     HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> new_transitions= new HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>>();
     ArrayList<ArrayList<Integer>> start = new ArrayList<ArrayList<Integer>>();
     ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
+    ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
     new_states.add(eclosures);
-    System.out.println((int)'a');
+    Q.add(eclosures);
     while(new_states.size()>0){
       for(int j : Sigma){
        if(j!=0){
-        System.out.println(Character.toString((char)j));
         a = new ArrayList<Integer>();
         for(int i : new_states.get(0)){
-          //System.out.println(new_states.get(0));
           ArrayList<Integer> tim = state_can_travers(i,j);
-          System.out.println("je suis tim :" + tim);
           if (tim!=null){
-            System.out.println("pk tu rentres pas");
             a.addAll(tim);
-            System.out.println("voici a : " + a);
           }
           }
         }
-        //System.out.println(a);
         if (a.size()>0){
-        //if (!new_states.contains(a)){
           new_states.add(a); 
-          // Faut marquer les états finaux et les étas du debut 
-          if (a.contains(1)){
-            start.add(a) ;
-          }
-          System.out.println("SISI" + f);
-          if (a.contains(f)){
-            fi.add(a) ;
+          if(!Q.contains(a)){
+            Q.add(a);
           }
           HashMap<Integer,ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
           if (tmp == null){
@@ -589,20 +578,36 @@ class NFA {
           }
           tmp.put(j,a);
           new_transitions.put(new_states.get(0),tmp);
-          System.out.println(new_states);
-          //ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
-          //Q.addAll(new_transitions.keySet())
+          //System.out.println(new_states);
           if(new_states.get(0)==new_states.get(1)){
-            return new DFA(new_states, Sigma,start,fi,new_transitions);
+            return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
           }
         }
-      //}
 
     }
     new_states.remove(0); //On marque l'état d'avant comme deja lu
     }
 
-    return new DFA(new_states, Sigma,start,fi,new_transitions);
+    return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
+  }
+
+  public boolean has_start_state(ArrayList<Integer> arr, int s){
+    for(int a : arr){
+      if (a==s){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public ArrayList<ArrayList<Integer>> get_states(ArrayList<ArrayList<Integer>> arri, int s){
+    ArrayList<ArrayList<Integer>> m = new ArrayList<ArrayList<Integer>>();
+    for(ArrayList a : arri){
+      if(has_start_state(a,s)){
+        m.add(a);
+      }
+    }
+    return m;
   }
 
   }
