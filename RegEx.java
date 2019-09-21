@@ -24,6 +24,7 @@ public class RegEx {
   //CONSTRUCTOR
   public RegEx(){}
 
+
   public static void main(String arg[]){
       ArrayList<Integer> Q = new ArrayList<Integer>();
       Q.add(0);
@@ -42,11 +43,15 @@ public class RegEx {
       Sigma.add((int)'c');
       Sigma.add(0);
       //Pour 0
+      // pour l'état 0: va vers 1 avec epsi ((int)0)
       Tuple t01 = new Tuple(1,(int)0);
+      // pour l'état 0: va vers 4 avec epsi ((int)0)
       Tuple t04 = new Tuple(4,(int)0);
+      // a0 representer les transition à partir de l'état 0
       ArrayList<Tuple> a0 = new ArrayList<Tuple>();
       a0.add(t01);
       a0.add(t04);
+
       //Pour 1
       Tuple t12 = new Tuple(2,(int)'a');
       ArrayList<Tuple> a1 = new ArrayList<Tuple>();
@@ -100,12 +105,76 @@ public class RegEx {
       nfa.print();
       System.out.println(nfa.eclosure(0));
       //System.out.println(nfa.state_can_travers(4,(int)'b'));
+      System.out.println("...................................................;....");
+      System.out.println("DFA");
       nfa.to_DFA().print();
-
-
-
+      System.out.println();
+      System.out.println("...................................................;....");
+      System.out.println("minDFA");
+      nfa.to_DFA().minDFA();
   }
 
+  /*
+  public static void main(String arg[]) {
+      ArrayList<Integer> Q = new ArrayList<Integer>();
+      Q.add(0);
+      Q.add(1);
+      Q.add(2);
+      Q.add(3);
+      Q.add(4);
+      Q.add(5);
+      Q.add(6);
+
+      ArrayList<Integer> Sigma = new ArrayList<Integer>();
+      Sigma.add((int)'a');
+      Sigma.add((int)'b');
+      Sigma.add(0);
+      //Pour 0
+      // pour l'état 0: va vers 1 avec epsi ((int)0)
+      Tuple t01 = new Tuple(1,(int)0);
+      // pour l'état 0: va vers 4 avec epsi ((int)0)
+      Tuple t04 = new Tuple(4,(int)0);
+      // a0 representer les transition à partir de l'état 0
+      ArrayList<Tuple> a0 = new ArrayList<Tuple>();
+      a0.add(t01);
+      a0.add(t04);
+
+      //Pour 1
+      Tuple t12 = new Tuple(2,(int)'a');
+      ArrayList<Tuple> a1 = new ArrayList<Tuple>();
+      a1.add(t12);
+
+      //Pour 2
+      Tuple t23 = new Tuple(3,(int)0);
+      ArrayList<Tuple> a2 = new ArrayList<Tuple>();
+      a2.add(t23);
+
+      //Pour 4
+      Tuple t45 = new Tuple(5,(int)'b');
+      ArrayList<Tuple> a4 = new ArrayList<Tuple>();
+      a4.add(t45);
+
+      //pour 5
+      Tuple t56 = new Tuple(6,(int)0);
+      ArrayList<Tuple> a5 = new ArrayList<Tuple>();
+      a5.add(t56);
+
+
+      HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
+      Transitions.put(0,a0); // les transitions qu'on peut faire à partir de l'état 0
+      Transitions.put(1,a1);
+      Transitions.put(2,a2);
+      Transitions.put(4,a4);
+      Transitions.put(5,a5);
+
+
+      NFA nfa = new NFA(Q,Sigma,0,3,Transitions);
+      nfa.print();
+      System.out.println(nfa.eclosure(0));
+      System.out.println(nfa.state_can_travers(4,(int)'b'));
+      nfa.to_DFA().print();
+  }
+  */
   /*
   //MAIN
   public static void main(String arg[]) throws Exception{
@@ -313,223 +382,189 @@ public class RegEx {
     return new RegExTree(ALTERN, subTrees);
   }
 }
- class Tuple {
-    protected int a;
-    protected int b;
-
-    public Tuple(int a, int b){
-      this.a = a;
-      this.b = b;
-    }
-    public void addA(int a){
-      a = a;
-    }
-
-    public void addB(int b){
-      b=b;
-    }
-
-    public int getA(){
-      return a;
-    }
-
-    public int getB(){
-      return b;
-    }
-
-    public String toString(){
-      if (b==0){
-        return "va vers " + a + " avec un epsilon";
-      }
-      else{
-        return "va vers " + a + " avec un " + Character.toString((char)b);
-      }
-    }
- }
 
 
 //Class pour gérér les automates finies avec des epsilon transition
-
 class NFA {
-  protected ArrayList<Integer> q = new ArrayList<Integer>();
-  protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
-  protected int q0 = -1;
-  protected int f = -1;
-  protected HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
+    protected ArrayList<Integer> q = new ArrayList<Integer>();
+    protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
+    protected int q0 = -1;
+    protected int f = -1;
+    protected HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
 
-  public NFA(ArrayList<Integer> Q,ArrayList<Integer> Sigma,int Q0, int F, HashMap<Integer,ArrayList<Tuple>> Transitions){
-    this.q = Q;
-    this.Sigma = Sigma;
-    this.q0 = Q0;
-    this.f = F;
-    this.Transitions = Transitions;
-  }
-
-  public ArrayList<Integer> getQ(){
-    return q;
-  }
-
-  public void add_state(int q){
-    this.q.add(q);
-  }
-
-  public void add_trans(int s){
-    Sigma.add(s);
-  }
-
-  public void set_final_state(int f){
-    f = f;
-  }
-
-  public void set_initial_state(int q0){
-    q0 = q0;
-  }
-
-  public void set_transitions(int t,int s1,int s2){
-    Tuple tu = new Tuple(s2,t);
-    ArrayList<Tuple> tmp = Transitions.get(s1);
-    if (tmp == null){
-      tmp = new ArrayList<Tuple>();
-    }
-    tmp.add(tu);
-    Transitions.put(s1,tmp);
-  }
-
-  public NFA concaten(NFA A2){
-    q.addAll(A2.q); //On rajoute les étas de A2 
-    set_transitions(0,f,A2.q0); 
-    f = A2.f; //L'état final est celui du deuxieme
-    Sigma.add(0) ;
-    for(int i : A2.Sigma){
-      if (Sigma.contains(i) == false){
-        Sigma.add(i);
-      }
-    }
-    //HashSet<Integer> Set = new HashSet<>( Arrays.asList(Sigma));     
-    return new NFA(q,Sigma,q0,f,Transitions);
-  }
-
-  public NFA etoil(){
-    int r1 = 0;
-    int r2 = 0; 
-    while(r1==r2 || r1==0 || r2==0 ){
-      Random rand = new Random();
-      r1 = rand.nextInt(100);
-      r2 = rand.nextInt(100);
-    }
-    q.add(r1);
-    q.add(r2);
-     if (Sigma.contains(0) == false){
-        Sigma.add(0);
-    }
-    set_transitions(0,r1,q0);
-    set_transitions(0,f,r2);
-    set_transitions(0,r1,r2);
-    set_transitions(0,f,q0);
-    f = r2;
-    q0 = r1;
-    return new NFA(q,Sigma,q0,f,Transitions);
-  }
-
-  public NFA altern(NFA A2){
-    int r1 = 0;
-    int r2 = 0; 
-    while(r1==r2 || r1==0 || r2==0){
-      Random rand = new Random();
-      r1 = rand.nextInt(100);
-      r2 = rand.nextInt(100);
-    }
-    q.add(r1);
-    q.add(r2);
-    q.addAll(A2.q);
-    if (Sigma.contains(0) == false){
-        Sigma.add(0);
-    }
-    for(int i : A2.Sigma){
-      if (Sigma.contains(i) == false){
-        Sigma.add(i);
-      }
-    }
-    set_transitions(0,r1,q0);
-    set_transitions(0,r1,A2.q0);
-    set_transitions(0,f,r2);
-    set_transitions(0,A2.f,r2);
-    q0 = r1;
-    f = r2;
-    return new NFA(q,Sigma,q0,f,Transitions);
-  }
-  
-
-  public void print_transitions(){
-    for (int key: this.Transitions.keySet()){
-      ArrayList<Tuple> value = Transitions.get(key);
-      System.out.print("  " +key + ": ");  
-        for (Tuple t : value) {
-          System.out.print(t.toString() + ", ");
-       }
-       System.out.println();
-    } 
-    System.out.println("}");
-  }
-
-
-  public void print(){
-    System.out.println("{  Q :" + this.getQ());
-    //System.out.println("  Sigma :" + Sigma);
-    System.out.println("  Q0 :" + q0);
-    System.out.println("  F :" + f);
-    System.out.print("  Sigma : { ");
-    for (int i : Sigma){
-      System.out.print( Character.toString((char)i) + " ");
-    }
-    System.out.println("} ");
-    print_transitions();
-  }
-
-  public ArrayList<Integer> eclosure(int i){
-    ArrayList<Integer> res = new ArrayList<Integer>();
-    res.add(i);
-    ArrayList<Tuple> a = Transitions.get(i);
-    for ( Tuple t : a ) {
-      if (t.getB() == 0){
-        res.add(t.getA());
-      }
-    }
-    return res;
+    public NFA(ArrayList<Integer> Q,ArrayList<Integer> Sigma,int Q0, int F, HashMap<Integer,ArrayList<Tuple>> Transitions){
+        this.q = Q; // les etats existant
+        this.Sigma = Sigma; //
+        this.q0 = Q0; // etat initial
+        this.f = F; // etat finale
+        this.Transitions = Transitions;
     }
 
-  public ArrayList<Integer> state_can_travers(int state, int alphabet){
-    ArrayList<Integer> res = new ArrayList<Integer>();
-    ArrayList<Tuple> a = Transitions.get(state);
-    ArrayList<Integer> tovisit = new ArrayList<Integer>();
+    public ArrayList<Integer> getQ(){
+        return q;
+    }
 
-    if(a!=null){
-    for ( Tuple t : a ) {
-      if (t.getB() == alphabet){
-        res.add(t.getA());
-        tovisit.add(t.getA());
-        while(tovisit.size()>0){
-          //System.out.println("HO");
-          if (Transitions.get(tovisit.get(0))==null){
-            return res;
-          }
-          else{
-            for ( Tuple ti : Transitions.get(tovisit.get(0))) {
-             // System.out.println("YO");
-              if (ti.getB() == 0){
-                tovisit.add(ti.getA());
-                res.add(ti.getA());
-              }
-            }
-            tovisit.remove(0);
-            //System.out.println(tovisit);
-          }      
+    public void add_state(int q){
+        this.q.add(q);
+    }
+
+    public void add_trans(int s){
+        Sigma.add(s);
+    }
+
+    public void set_final_state(int f){
+        f = f;
+    }
+
+    public void set_initial_state(int q0){
+        q0 = q0;
+    }
+
+    public void set_transitions(int t,int s1,int s2){
+        Tuple tu = new Tuple(s2,t);
+        ArrayList<Tuple> tmp = Transitions.get(s1);
+        if (tmp == null){
+            tmp = new ArrayList<Tuple>();
         }
-      }
+        tmp.add(tu);
+        Transitions.put(s1,tmp);
     }
-  }
-    return res;
-  }
+
+    public NFA concaten(NFA A2){
+        q.addAll(A2.q); //On rajoute les étas de A2
+        set_transitions(0,f,A2.q0);
+        f = A2.f; //L'état final est celui du deuxieme
+        Sigma.add(0) ;
+        for(int i : A2.Sigma){
+            if (Sigma.contains(i) == false){
+                Sigma.add(i);
+            }
+        }
+        //HashSet<Integer> Set = new HashSet<>( Arrays.asList(Sigma));
+        return new NFA(q,Sigma,q0,f,Transitions);
+    }
+
+    public NFA etoil(){
+        int r1 = 0;
+        int r2 = 0;
+        while(r1==r2 || r1==0 || r2==0 ){
+            Random rand = new Random();
+            r1 = rand.nextInt(100);
+            r2 = rand.nextInt(100);
+        }
+        q.add(r1);
+        q.add(r2);
+        if (Sigma.contains(0) == false){
+            Sigma.add(0);
+        }
+        set_transitions(0,r1,q0);
+        set_transitions(0,f,r2);
+        set_transitions(0,r1,r2);
+        set_transitions(0,f,q0);
+        f = r2;
+        q0 = r1;
+        return new NFA(q,Sigma,q0,f,Transitions);
+    }
+
+    public NFA altern(NFA A2){
+        int r1 = 0;
+        int r2 = 0;
+        while(r1==r2 || r1==0 || r2==0){
+            Random rand = new Random();
+            r1 = rand.nextInt(100);
+            r2 = rand.nextInt(100);
+        }
+        q.add(r1);
+        q.add(r2);
+        q.addAll(A2.q);
+        if (Sigma.contains(0) == false){
+            Sigma.add(0);
+        }
+        for(int i : A2.Sigma){
+            if (Sigma.contains(i) == false){
+                Sigma.add(i);
+            }
+        }
+        set_transitions(0,r1,q0);
+        set_transitions(0,r1,A2.q0);
+        set_transitions(0,f,r2);
+        set_transitions(0,A2.f,r2);
+        q0 = r1;
+        f = r2;
+        return new NFA(q,Sigma,q0,f,Transitions);
+    }
+
+
+    public void print_transitions(){
+        for (int key: this.Transitions.keySet()){
+            ArrayList<Tuple> value = Transitions.get(key);
+            System.out.print("  " +key + ": ");
+            for (Tuple t : value) {
+                System.out.print(t.toString() + ", ");
+            }
+            System.out.println();
+        }
+        System.out.println("}");
+    }
+
+
+    public void print(){
+        System.out.println("{  Q :" + this.getQ());
+        //System.out.println("  Sigma :" + Sigma);
+        System.out.println("  Q0 :" + q0);
+        System.out.println("  F :" + f);
+        System.out.print("  Sigma : { ");
+        for (int i : Sigma){
+            System.out.print( Character.toString((char)i) + " ");
+        }
+        System.out.println("} ");
+        print_transitions();
+    }
+
+    public ArrayList<Integer> eclosure(int i){
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        res.add(i);
+        ArrayList<Tuple> a = Transitions.get(i);
+        for ( Tuple t : a ) {
+            if (t.getB() == 0){
+                res.add(t.getA());
+            }
+        }
+        return res;
+    }
+
+    public ArrayList<Integer> state_can_travers(int state, int alphabet){
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Tuple> a = Transitions.get(state);
+        ArrayList<Integer> tovisit = new ArrayList<Integer>();
+
+        if(a!=null){
+            for ( Tuple t : a ) {
+                if (t.getB() == alphabet){
+                    res.add(t.getA());
+                    tovisit.add(t.getA());
+                    while(tovisit.size()>0){
+                        //System.out.println("HO");
+                        if (Transitions.get(tovisit.get(0))==null){
+                            return res;
+                        }
+                        else{
+                            for ( Tuple ti : Transitions.get(tovisit.get(0))) {
+                                // System.out.println("YO");
+                                if (ti.getB() == 0){
+                                    tovisit.add(ti.getA());
+                                    res.add(ti.getA());
+                                }
+                            }
+                            tovisit.remove(0);
+                            //System.out.println(tovisit);
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
     /*
     ArrayList<Integer> res = new ArrayList<Integer>();
     ArrayList<Tuple> a = Transitions.get(state);
@@ -545,165 +580,240 @@ class NFA {
           }
       }*/
 
-  // {[2 3 1] : {[5 6 7]:a , [8 9 10]:b}}
-  public DFA to_DFA(){
-    ArrayList<Integer> eclosures = eclosure(q0); //On a calculer les e-closures des états
-    ArrayList<ArrayList<Integer>> new_states= new ArrayList<ArrayList<Integer>>();
-    ArrayList<Integer> a= new ArrayList<Integer>();
-    HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> new_transitions= new HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>>();
-    ArrayList<ArrayList<Integer>> start = new ArrayList<ArrayList<Integer>>();
-    ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
-    ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
-    new_states.add(eclosures);
-    Q.add(eclosures);
-    while(new_states.size()>0){
-      for(int j : Sigma){
-       if(j!=0){
-        a = new ArrayList<Integer>();
-        for(int i : new_states.get(0)){
-          ArrayList<Integer> tim = state_can_travers(i,j);
-          if (tim!=null){
-            a.addAll(tim);
-          }
-          }
+    // {[2 3 1] : {[5 6 7]:a , [8 9 10]:b}}
+    public DFA to_DFA(){
+        ArrayList<Integer> eclosures = eclosure(q0); //On a calculer les e-closures des états
+        ArrayList<ArrayList<Integer>> new_states= new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> a= new ArrayList<Integer>();
+        HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> new_transitions= new HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>>();
+        ArrayList<ArrayList<Integer>> start = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
+        new_states.add(eclosures);
+        Q.add(eclosures);
+        while(new_states.size()>0){
+            for(int j : Sigma){
+                if(j!=0){
+                    a = new ArrayList<Integer>();
+                    for(int i : new_states.get(0)){
+                        ArrayList<Integer> tim = state_can_travers(i,j);
+                        if (tim!=null){
+                            a.addAll(tim);
+                        }
+                    }
+                }
+                if (a.size()>0){
+                    new_states.add(a);
+                    if(!Q.contains(a)){
+                        Q.add(a);
+                    }
+                    HashMap<Integer,ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
+                    if (tmp == null){
+                        tmp = new HashMap<Integer,ArrayList<Integer>> ();
+                    }
+                    tmp.put(j,a);
+                    new_transitions.put(new_states.get(0),tmp);
+                    //System.out.println(new_states);
+                    if(new_states.get(0)==new_states.get(1)){
+                        return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
+                    }
+                }
+
+            }
+            new_states.remove(0); //On marque l'état d'avant comme deja lu
         }
-        if (a.size()>0){
-          new_states.add(a); 
-          if(!Q.contains(a)){
-            Q.add(a);
-          }
-          HashMap<Integer,ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
-          if (tmp == null){
-            tmp = new HashMap<Integer,ArrayList<Integer>> ();
-          }
-          tmp.put(j,a);
-          new_transitions.put(new_states.get(0),tmp);
-          //System.out.println(new_states);
-          if(new_states.get(0)==new_states.get(1)){
-            return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
-          }
+
+        return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
+    }
+
+    public boolean has_start_state(ArrayList<Integer> arr, int s){
+        for(int a : arr){
+            if (a==s){
+                return true;
+            }
         }
-
-    }
-    new_states.remove(0); //On marque l'état d'avant comme deja lu
+        return false;
     }
 
-    return new DFA(Q, Sigma,get_states(Q,q0),get_states(Q,f),new_transitions);
-  }
-
-  public boolean has_start_state(ArrayList<Integer> arr, int s){
-    for(int a : arr){
-      if (a==s){
-        return true;
-      }
+    public ArrayList<ArrayList<Integer>> get_states(ArrayList<ArrayList<Integer>> arri, int s){
+        ArrayList<ArrayList<Integer>> m = new ArrayList<ArrayList<Integer>>();
+        for(ArrayList a : arri){
+            if(has_start_state(a,s)){
+                m.add(a);
+            }
+        }
+        return m;
     }
-    return false;
-  }
 
-  public ArrayList<ArrayList<Integer>> get_states(ArrayList<ArrayList<Integer>> arri, int s){
-    ArrayList<ArrayList<Integer>> m = new ArrayList<ArrayList<Integer>>();
-    for(ArrayList a : arri){
-      if(has_start_state(a,s)){
-        m.add(a);
-      }
+}
+
+class Tuple {
+    protected int a;
+    protected int b;
+
+    public Tuple(int a, int b){
+        this.a = a;
+        this.b = b;
     }
-    return m;
-  }
-
-  }
-
-class DFA {
-  protected ArrayList<ArrayList<Integer>> q = new ArrayList<ArrayList<Integer>>();
-  protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
-  protected ArrayList<ArrayList<Integer>> q0;
-  protected ArrayList<ArrayList<Integer>> f;
-  protected HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> Transitions= new HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>>();
-
-  public DFA(ArrayList<ArrayList<Integer>> Q,ArrayList<Integer> Sigma,ArrayList<ArrayList<Integer>> Q0, ArrayList<ArrayList<Integer>> F,  HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> Transitions){
-    this.q = Q;
-    this.Sigma = Sigma;
-    this.q0 = Q0;
-    this.f = F;
-    this.Transitions = Transitions;
-  }
-  
-  public void print(){
-    System.out.println("{  Q :" + q);
-    //System.out.println("  Sigma :" + Sigma);
-    System.out.println("  Q0 :" + q0);
-    System.out.println("  F :" + f);
-    System.out.print("  Sigma : { ");
-    for (int i : Sigma){
-      System.out.print( Character.toString((char)i) + " ");
+    public void addA(int a){
+        a = a;
     }
-    System.out.println("} ");
-    System.out.println(Transitions);
-  }
-  }
+
+    public void addB(int b){
+        b=b;
+    }
+
+    public int getA(){
+        return a;
+    }
+
+    public int getB(){
+        return b;
+    }
+
+    public String toString(){
+        if (b==0){
+            return "va vers " + a + " avec un epsilon";
+        }
+        else{
+            return "va vers " + a + " avec un " + Character.toString((char)b);
+        }
+    }
+}
 
 
 
 //UTILITARY CLASS
 class RegExTree {
-  protected int root;
-  protected ArrayList<RegExTree> subTrees;
-  public RegExTree(int root, ArrayList<RegExTree> subTrees) {
-    this.root = root;
-    this.subTrees = subTrees;
-  }
-  //FROM TREE TO PARENTHESIS
-	
-  public NFA toAutomaton() {
+    protected int root;
+    protected ArrayList<RegExTree> subTrees;
+    public RegExTree(int root, ArrayList<RegExTree> subTrees) {
+        this.root = root;
+        this.subTrees = subTrees;
+    }
+    //FROM TREE TO PARENTHESIS
 
-    if (root==RegEx.CONCAT) {
-      return subTrees.get(0).toAutomaton().concaten(subTrees.get(1).toAutomaton());
+    public NFA toAutomaton() {
+
+        if (root==RegEx.CONCAT) {
+            return subTrees.get(0).toAutomaton().concaten(subTrees.get(1).toAutomaton());
+        }
+
+
+        if (root==RegEx.ETOILE) {
+            return subTrees.get(0).toAutomaton().etoil();
+        }
+
+        if (root==RegEx.ALTERN) {
+            return subTrees.get(0).toAutomaton().altern(subTrees.get(1).toAutomaton());
+        }
+
+        ArrayList<Integer> Q = new ArrayList<Integer>();
+        int r1 = 0;
+        int r2 = 0;
+        while(r1==r2 || r1==0 || r2==0){
+            Random rand = new Random();
+            r1 = rand.nextInt(100);
+            r2 = rand.nextInt(100);
+        }
+
+        //Si on est là c'est qu'on tombe les feuilles de l'arbre (des lettre)
+
+        Q.add(r1);
+        Q.add(r2);
+        ArrayList<Integer> Sigma = new ArrayList<Integer>();
+        Sigma.add(root);
+        Tuple ti = new Tuple(r2,root);
+        ArrayList<Tuple> t = new ArrayList<Tuple>();
+        t.add(ti);
+        HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
+        Transitions.put(r1,t);
+        NFA n = new NFA(Q,Sigma,r1,r2,Transitions);
+        return n;
     }
 
-
-    if (root==RegEx.ETOILE) {
-      return subTrees.get(0).toAutomaton().etoil();
+    public String toString() {
+        if (subTrees.isEmpty()) return rootToString();
+        String result = rootToString()+"("+subTrees.get(0).toString();
+        for (int i=1;i<subTrees.size();i++) result+=","+subTrees.get(i).toString();
+        return result+")";
     }
-
-    if (root==RegEx.ALTERN) {
-      return subTrees.get(0).toAutomaton().altern(subTrees.get(1).toAutomaton());
+    private String rootToString() {
+        if (root==RegEx.CONCAT) return ".";
+        if (root==RegEx.ETOILE) return "*";
+        if (root==RegEx.ALTERN) return "|";
+        if (root==RegEx.DOT) return ".";
+        return Character.toString((char)root);
     }
-
-    ArrayList<Integer> Q = new ArrayList<Integer>();
-    int r1 = 0;
-    int r2 = 0; 
-    while(r1==r2 || r1==0 || r2==0){
-      Random rand = new Random();
-      r1 = rand.nextInt(100);
-      r2 = rand.nextInt(100);
-    }
-
-    //Si on est là c'est qu'on tombe les feuilles de l'arbre (des lettre)
-
-    Q.add(r1);
-    Q.add(r2);
-    ArrayList<Integer> Sigma = new ArrayList<Integer>();
-    Sigma.add(root);
-    Tuple ti = new Tuple(r2,root);
-    ArrayList<Tuple> t = new ArrayList<Tuple>();
-    t.add(ti);
-    HashMap<Integer,ArrayList<Tuple>> Transitions = new HashMap<Integer, ArrayList<Tuple>>();
-    Transitions.put(r1,t);
-    NFA n = new NFA(Q,Sigma,r1,r2,Transitions);
-    return n;
-  }
-
-  public String toString() {
-    if (subTrees.isEmpty()) return rootToString();
-    String result = rootToString()+"("+subTrees.get(0).toString();
-    for (int i=1;i<subTrees.size();i++) result+=","+subTrees.get(i).toString();
-    return result+")";
-  }
-  private String rootToString() {
-    if (root==RegEx.CONCAT) return ".";
-    if (root==RegEx.ETOILE) return "*";
-    if (root==RegEx.ALTERN) return "|";
-    if (root==RegEx.DOT) return ".";
-    return Character.toString((char)root);
-  }
 
 }
+
+
+class DFA {
+    protected ArrayList<ArrayList<Integer>> q = new ArrayList<ArrayList<Integer>>();
+    protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
+    protected ArrayList<ArrayList<Integer>> q0;
+    protected ArrayList<ArrayList<Integer>> f;
+    protected HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> Transitions= new HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>>();
+
+    public DFA(ArrayList<ArrayList<Integer>> Q,ArrayList<Integer> Sigma,ArrayList<ArrayList<Integer>> Q0, ArrayList<ArrayList<Integer>> F,  HashMap<ArrayList<Integer>,HashMap<Integer,ArrayList<Integer>>> Transitions){
+        this.q = Q;
+        this.Sigma = Sigma;
+        this.q0 = Q0;
+        this.f = F;
+        this.Transitions = Transitions;
+    }
+    public void minDFA(){
+        /**
+         * pour chaque transition de A vers B avec x, on vérifie
+         *      si A est un etat finale,
+         *      si B est finale,
+         *      de-là on supprime la transiton (B,c) et on rajoute la transition (A,c)
+         *      et si on utilise plus l'etat B alors on le supprime dde notre liste de Transition
+         */
+
+        int nbStatsVisited = 1;
+        int nbStats = this.Transitions.size();
+
+        for (ArrayList<Integer> key: this.Transitions.keySet()) {
+            nbStatsVisited += 1;
+            HashMap<Integer, ArrayList<Integer>> value = Transitions.get(key);
+            // System.out.print("  " + key + ": ");
+
+            if (this.f.contains(key)) {
+                for (Integer x : value.keySet()) {
+                    ArrayList<Integer> valueX = value.get(x);
+
+                    if (!key.equals(valueX) && this.f.contains(valueX)) {
+                        ArrayList<Integer> B = Transitions.get(key).get(x);
+                        Transitions.get(key).put(x, key);
+                        Transitions.get(B).remove(x);
+
+                        if(Transitions.containsKey(B) && Transitions.get(B).isEmpty()){
+                            Transitions.remove(B);
+                            nbStats -= 1;
+                        }
+                    }
+                }
+            }
+            if(nbStatsVisited == nbStats)
+                break;
+        }
+    }
+
+    public void print(){
+        System.out.println("{  Q :" + q);
+        //System.out.println("  Sigma :" + Sigma);
+        System.out.println("  Q0 :" + q0);
+        System.out.println("  F :" + f);
+        System.out.print("  Sigma : { ");
+        for (int i : Sigma){
+            System.out.print( Character.toString((char)i) + " ");
+        }
+        System.out.println("} ");
+        System.out.println(Transitions);
+    }
+}
+
+
+
