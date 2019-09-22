@@ -323,15 +323,15 @@ public class RegEx {
         System.out.println("  >> Here is the DFA of the tree : ");
         DFA d = n.to_DFA();
         d.print();
-        System.out.println("  >> Here is the DFA min of the tree : ");
-        d.minDFA();
-        d.print();
-        Scanner scanner = new Scanner(System.in);
+        //System.out.println("  >> Here is the DFA min of the tree : ");
+        //d.minDFA();
+        //d.print();
+        //Scanner scanner = new Scanner(System.in);
         System.out.print("  >> Please enter the name of your file: ");
         /*String file = scanner.next();
         d.search(readLineByLineJava8(file));
         String file = scanner.next();*/
-        d.search("abc");
+       // d.search("abc");
         //} catch (Exception e) {
         //System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
       //}
@@ -773,18 +773,18 @@ class NFA {
                 }
                 if(j!=0){
                     if (a.size() > 0) {
-                        new_states.add(a);
                         if (!Q.contains(a)) {
                             Q.add(a);
-                        }
+                        
+                        new_states.add(a);
                         HashMap<Integer, ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
                         if (tmp == null) {
                             tmp = new HashMap<Integer, ArrayList<Integer>>();
                         }
                         tmp.put(j, a);
                         new_transitions.put(new_states.get(0), tmp);
-                        System.out.println("BOBOB" + j);
-                        System.out.println(new_states);
+                        System.out.println("BOBOB " + j);
+                        }
                     }
                 }
             }
@@ -796,6 +796,8 @@ class NFA {
                 }
             }
             new_states.remove(0); //On marque l'état d'avant comme deja lu
+            System.out.println(new_states);
+
         }
 
         return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
