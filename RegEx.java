@@ -314,7 +314,7 @@ public class RegEx {
       System.out.print("  >> ASCII codes: ["+(int)regEx.charAt(0));
       for (int i=1;i<regEx.length();i++) System.out.print(","+(int)regEx.charAt(i));
       System.out.println("].");
-      try {
+     // try {
         RegExTree ret = parse();
         System.out.println("  >> Tree result: "+ret.toString()+".");
         System.out.println("  >> Here is the NFA of the tree : ");
@@ -332,9 +332,9 @@ public class RegEx {
         d.search(readLineByLineJava8(file));
         String file = scanner.next();*/
         d.search("abc");
-        } catch (Exception e) {
-        System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
-      }
+        //} catch (Exception e) {
+        //System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
+      //}
     }
 
     System.out.println("  >> ...");
@@ -788,10 +788,12 @@ class NFA {
                     }
                 }
             }
-            System.out.println("yo" + new_states.get(0));
-            System.out.println("yo2" + new_states.get(1));
-            if (new_states.get(0).equals(new_states.get(1))) {
-                return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
+            //System.out.println("yo" + new_states.get(0));
+            //System.out.println("yo2" + new_states.get(1));
+            if (new_states.size()>1){
+                if (new_states.get(0).equals(new_states.get(1))) {
+                    return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
+                }
             }
             new_states.remove(0); //On marque l'état d'avant comme deja lu
         }
