@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class RegEx {
     public RegEx() {
     }
 
-
+/*
     public static void main(String arg[]) {
         ArrayList<Integer> Q = new ArrayList<Integer>();
         Q.add(0);
@@ -120,7 +121,7 @@ public class RegEx {
         System.out.println();
         dfa.search("accabcbccc");
     }
-    public static void main1(String arg[]) {
+    /*public static void main1(String arg[]) {
         ArrayList<Integer> Q = new ArrayList<Integer>();
         Q.add(0);
         Q.add(1);
@@ -279,8 +280,22 @@ public class RegEx {
         nfa.to_DFA().print();
     }
     */
-  /*
+  
   //MAIN
+   /* private static String readLineByLineJava8(String filePath)
+{
+    StringBuilder contentBuilder = new StringBuilder();
+    try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
+    {
+        stream.forEach(s -> contentBuilder.append(s).append("\n"));
+    }
+    catch (IOException e)
+    {
+        e.printStackTrace();
+    }
+    return contentBuilder.toString();
+}*/
+ 
   public static void main(String arg[]) throws Exception{
     System.out.println("Welcome to Bogota, Mr. Thomas Anderson.");
     if (arg.length!=0) {
@@ -300,10 +315,23 @@ public class RegEx {
       for (int i=1;i<regEx.length();i++) System.out.print(","+(int)regEx.charAt(i));
       System.out.println("].");
       try {
-        RegExTree retext + DFAtext + DFAtext + DFAtext + DFAt = parse();
+        RegExTree ret = parse();
         System.out.println("  >> Tree result: "+ret.toString()+".");
         System.out.println("  >> Here is the NFA of the tree : ");
-        ret.toAutomaton().print();
+        NFA n = ret.toAutomaton();
+        n.print();
+        System.out.println("  >> Here is the DFA of the tree : ");
+        DFA d = n.to_DFA();
+        d.print();
+        System.out.println("  >> Here is the DFA min of the tree : ");
+        d.minDFA();
+        d.print();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("  >> Please enter the name of your file: ");
+        /*String file = scanner.next();
+        d.search(readLineByLineJava8(file));
+        String file = scanner.next();*/
+        d.search("abc");
         } catch (Exception e) {
         System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
       }
@@ -313,7 +341,7 @@ public class RegEx {
     System.out.println("  >> Parsing completed.");
     System.out.println("Goodbye Mr. Anderson.");
   }
-*/
+
     //FROM REGEX TO SYNTAX TREE
     private static RegExTree parse() throws Exception {
         //BEGIN DEBUG: set conditionnal to true for debug example
@@ -552,9 +580,22 @@ class NFA {
         Transitions.put(s1, tmp);
     }
 
+    public HashMap<Integer, ArrayList<Tuple>> merge(HashMap<Integer, ArrayList<Tuple>> t1, HashMap<Integer, ArrayList<Tuple>> t2){
+        
+        HashMap<Integer, ArrayList<Tuple>> m = t1;
+        System.out.println("yoooo");
+        t2.forEach((key, value) -> m.put(key,value));
+        
+        return m;
+    }
+
+
     public NFA concaten(NFA A2) {
+        System.out.println("je suis correcte");
         q.addAll(A2.q); //On rajoute les étas de A2
+
         set_transitions(0, f, A2.q0);
+        HashMap<Integer, ArrayList<Tuple>> m = merge(Transitions,A2.Transitions);
         f = A2.f; //L'état final est celui du deuxieme
         Sigma.add(0);
         for (int i : A2.Sigma) {
@@ -562,17 +603,19 @@ class NFA {
                 Sigma.add(i);
             }
         }
+        System.out.println("je viens ici");
+        //print_transitions();
         //HashSet<Integer> Set = new HashSet<>( Arrays.asList(Sigma));
-        return new NFA(q, Sigma, q0, f, Transitions);
+        return new NFA(q, Sigma, q0, f, m);
     }
 
     public NFA etoil() {
         int r1 = 0;
         int r2 = 0;
-        while (r1 == r2 || r1 == 0 || r2 == 0) {
+        while (r1 == r2 || r1 == 0 || r2 == 0 || q.contains(r1) || q.contains(r2)) {
             Random rand = new Random();
-            r1 = rand.nextInt(100);
-            r2 = rand.nextInt(100);
+            r1 = rand.nextInt(1000);
+            r2 = rand.nextInt(1000);
         }
         q.add(r1);
         q.add(r2);
@@ -591,7 +634,7 @@ class NFA {
     public NFA altern(NFA A2) {
         int r1 = 0;
         int r2 = 0;
-        while (r1 == r2 || r1 == 0 || r2 == 0) {
+        while (r1 == r2 || r1 == 0 || r2 == 0 || q.contains(r1) || q.contains(r2)) {
             Random rand = new Random();
             r1 = rand.nextInt(100);
             r2 = rand.nextInt(100);
@@ -607,13 +650,15 @@ class NFA {
                 Sigma.add(i);
             }
         }
+        print_transitions();
         set_transitions(0, r1, q0);
         set_transitions(0, r1, A2.q0);
         set_transitions(0, f, r2);
         set_transitions(0, A2.f, r2);
+        HashMap<Integer, ArrayList<Tuple>> m = merge(Transitions,A2.Transitions);
         q0 = r1;
         f = r2;
-        return new NFA(q, Sigma, q0, f, Transitions);
+        return new NFA(q, Sigma, q0, f, m);
     }
 
 
@@ -711,8 +756,11 @@ class NFA {
         ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
         new_states.add(eclosures);
+        System.out.println("al al la la ");
+        System.out.println(eclosures);
         Q.add(eclosures);
         while (new_states.size() > 0) {
+            System.out.println("C'est chaud");
             for (int j : Sigma) {
                 if (j != 0) {
                     a = new ArrayList<Integer>();
@@ -723,23 +771,27 @@ class NFA {
                         }
                     }
                 }
-                if (a.size() > 0) {
-                    new_states.add(a);
-                    if (!Q.contains(a)) {
-                        Q.add(a);
-                    }
-                    HashMap<Integer, ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
-                    if (tmp == null) {
-                        tmp = new HashMap<Integer, ArrayList<Integer>>();
-                    }
-                    tmp.put(j, a);
-                    new_transitions.put(new_states.get(0), tmp);
-                    //System.out.println(new_states);
-                    if (new_states.get(0) == new_states.get(1)) {
-                        return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
+                if(j!=0){
+                    if (a.size() > 0) {
+                        new_states.add(a);
+                        if (!Q.contains(a)) {
+                            Q.add(a);
+                        }
+                        HashMap<Integer, ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
+                        if (tmp == null) {
+                            tmp = new HashMap<Integer, ArrayList<Integer>>();
+                        }
+                        tmp.put(j, a);
+                        new_transitions.put(new_states.get(0), tmp);
+                        System.out.println("BOBOB" + j);
+                        System.out.println(new_states);
                     }
                 }
-
+            }
+            System.out.println("yo" + new_states.get(0));
+            System.out.println("yo2" + new_states.get(1));
+            if (new_states.get(0).equals(new_states.get(1))) {
+                return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
             }
             new_states.remove(0); //On marque l'état d'avant comme deja lu
         }
@@ -829,13 +881,15 @@ class RegExTree {
             return subTrees.get(0).toAutomaton().altern(subTrees.get(1).toAutomaton());
         }
 
+        //simple_char();
+
         ArrayList<Integer> Q = new ArrayList<Integer>();
         int r1 = 0;
         int r2 = 0;
         while (r1 == r2 || r1 == 0 || r2 == 0) {
             Random rand = new Random();
-            r1 = rand.nextInt(100);
-            r2 = rand.nextInt(100);
+            r1 = rand.nextInt(1000);
+            r2 = rand.nextInt(1000);
         }
 
         //Si on est là c'est qu'on tombe les feuilles de l'arbre (des lettre)
