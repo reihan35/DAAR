@@ -336,9 +336,13 @@ public class RegEx {
             Scanner scanner = new Scanner(System.in);
             System.out.print("  >> Please enter the name of your file: ");
             String file = scanner.next();
+
             // String text = "atroSagrgaronBabyloniaSagrjaion"
             // String text = "This eBook is for the use of anyone anywhere in the United States and most";
-            if (regEx.contains("\n")) {
+            // String text = "line: past may have caused the flooding of the left bank above E-Sagila.[57]";
+            //d.search(text);
+
+            if (regEx.contains("a")) {
                 System.out.println("je suis dans le if");
                 String text = readFileChar("./res/fileData.txt");
                 d.search(text);
@@ -363,6 +367,7 @@ public class RegEx {
             Scanner scanner = new Scanner(new File(file));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
+                // System.out.println("line: " + line);
                 d.search(line);
             }
         } catch (Exception e) {
@@ -988,11 +993,11 @@ class DFA {
          *      et si on utilise plus l'etat B alors on le supprime de part tout(q, f, Transitions)
          */
 
-        int nbStatsVisited = 1;
-        int nbStats = this.Transitions.size();
+        int nbStatesVisited = 1;
+        int nbStates = this.Transitions.size();
 
         for (ArrayList<Integer> key : this.Transitions.keySet()) {
-            nbStatsVisited += 1;
+            nbStatesVisited += 1;
             HashMap<Integer, ArrayList<Integer>> value = Transitions.get(key);
 
             if (this.f.contains(key)) {
@@ -1008,12 +1013,12 @@ class DFA {
                             Transitions.remove(B);
                             this.f.remove(B);
                             this.q.remove(B);
-                            nbStats -= 1;
+                            nbStates -= 1;
                         }
                     }
                 }
             }
-            if (nbStatsVisited == nbStats)
+            if (nbStatesVisited == nbStates)
                 break;
         }
     }
@@ -1043,15 +1048,17 @@ class DFA {
 
                     if (Transitions.containsKey(currentState) && i < N - 1) {
                         nextState = Transitions.get(currentState).get((int) txt.charAt(i + 1));
+                        // currentChar = currentChar + txt.charAt(i + 1);
                         // System.out.println("    next txt: " + txt.charAt(i + 1));
                         // System.out.println("    0 nextState: " + nextState);
                         change = false;
                         while (nextState != null && i < N - 1) {
                             change = true;
                             // System.out.println("    ***************");
-                            currentChar = currentChar + txt.charAt(i + 1);
                             i += 1;
                             nextState = Transitions.get(currentState).get((int) txt.charAt(i));
+                            if (nextState != null)
+                                currentChar = currentChar + txt.charAt(i);
                             // System.out.println("    1 next txt: " + txt.charAt(i));
                             // System.out.println("    1 currentChar: " + currentChar);
                         }
