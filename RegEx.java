@@ -1,4 +1,3 @@
-
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +26,8 @@ public class RegEx {
     public RegEx() {
     }
 
-/*
-    public static void main(String arg[]) {
+
+    public static void main3(String arg[]) {
         ArrayList<Integer> Q = new ArrayList<Integer>();
         Q.add(0);
         Q.add(1);
@@ -120,9 +119,9 @@ public class RegEx {
         System.out.println();
         System.out.println("...................................................;....");
         System.out.println();
-        dfa.search("accabcbccc");
+        // dfa.search("accabcbccc");
     }
-    /*public static void main1(String arg[]) {
+    public static void main1(String arg[]) {
         ArrayList<Integer> Q = new ArrayList<Integer>();
         Q.add(0);
         Q.add(1);
@@ -201,7 +200,7 @@ public class RegEx {
         Transitions.put(4, a4);
         Transitions.put(5, a5);
 
-        NFA nfa = new NFA(Q, Sigma, 0, 6, Transitions);
+        NFA nfa = new NFA(Q, Sigma, 0, 3, Transitions);
         nfa.print();
         System.out.println(nfa.eclosure(0));
         //System.out.println(nfa.state_can_travers(4,(int)'b'));
@@ -217,7 +216,8 @@ public class RegEx {
         System.out.println();
         System.out.println("...................................................;....");
         System.out.println();
-        dfa.search("accabcbccc");
+        Search search = new Search();
+        search.searchWithDFA(dfa, "accabcbcc");
     }
 
     /*
@@ -318,7 +318,7 @@ public class RegEx {
             for (int i = 1; i < regEx.length(); i++) System.out.print("," + (int) regEx.charAt(i));
             System.out.println("].");
             try {
-                /*
+
                 RegExTree ret = parse();
                 System.out.println("  >> Tree result: " + ret.toString() + ".");
                 System.out.println("  >> Here is the NFA of the tree : ");
@@ -328,40 +328,44 @@ public class RegEx {
                 DFA d = n.to_DFA();
                 d.print();
 
+                /*
+                System.out.println("0 ***********************************************");
                 System.out.println("  >> Here is the DFA min of the tree : ");
                 d.minDFA();
                 d.print();
+                */
 
-                String file = "./res/fileData.txt";*/
+                String file = "./res/fileData.txt";
+
                 /*
                 Scanner scanner = new Scanner(System.in);
                 System.out.print("  >> Please enter the name of your file: ");
                 String file = scanner.next();
                 */
 
-                // tester un exemple local
                 // String text = "atroSagrgaronBabyloniaSagrjaion"
-                String text = "SarSf anyoargoniSachichagrs nichichchichaated Sargontates and most";
+                String text = " This eBook is for the use of anyone anywhere in the United States and most";
+                // text = "Sonder";
+                // text = "arbbccct";
                 // String text = "line: past may have caused the flooding of the left bank above E-Sagila.[57]";
                 // d.search(text);
 
-
-                /*
-                if (regEx.contains("\n")) {
-                    // dans le cas où '\n' est dans l'expréssion régulière
-                    String text = readFileChar("./res/fileData.txt");
-                    d.search(text);
-                } else {
-                    // la methode est plus rapide
-                    readFileLine(file, d);
-                }*/
-
+                boolean oui = true;
                 Search search = new Search();
-                regEx = "chicha";
                 ArrayList wordMatch = new ArrayList<>();
-
-                if(isRegex(regEx)){
-
+                if(isRegex(regEx) && oui){
+                    if (regEx.contains("a")) {
+                        System.out.println("....IF.....");
+                        System.out.println(" regEx: " + regEx);
+                        // dans le cas où '\n' est dans l'expréssion régulière
+                        text = search.readFileChar("./res/fileData.txt");
+                        System.out.println(" text: " + text);
+                        search.searchWithDFA(d, text);
+                    } else {
+                        // la methode est plus rapide
+                        System.out.println("....ELSE.....");
+                        readFileLine(file, d, search);
+                    }
                 }else{
                     int [] retenue = search.retenue(regEx);
                     int lastIdx = 0;
@@ -369,9 +373,6 @@ public class RegEx {
                     int result = search.matchingWords(regEx.toCharArray(), retenue, text.toCharArray());
                     if(result!=-1)
                         wordMatch.add(result);
-
-                    // System.out.println("** index :" + result);
-                    // System.out.println("** result :" + text.substring(result, result+facteur.length()));
 
                     while(result != -1){
                         lastIdx = result + regEx.length();
@@ -384,15 +385,28 @@ public class RegEx {
                     System.out.println("word match: " + wordMatch);
                 }
 
-
             } catch (Exception e) {
-                System.err.println("  >> ERROR: syntax error for regEx \"" + regEx + "\".");
+                System.err.println("  >> ERROR: syntax error for regEx \"" + regEx + "\". "+ e);
             }
         }
 
         System.out.println("  >> ...");
         System.out.println("  >> Parsing completed.");
         System.out.println("Goodbye Mr. Anderson.");
+    }
+
+    public static void readFileLine(String file, DFA d, Search search) throws FileNotFoundException {
+        ArrayList<String> resutls = new ArrayList<String>();
+        try {
+            Scanner scanner = new Scanner(new File(file));
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                System.out.println("line: " + line);
+                search.searchWithDFA(d, line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static boolean isRegex(String str){
@@ -786,6 +800,7 @@ class NFA {
     }
 
     // {[2 3 1] : {[5 6 7]:a , [8 9 10]:b}}
+
     public DFA to_DFA() {
         ArrayList<Integer> eclosures = eclosure(q0); //On a calculer les e-closures des états
         ArrayList<ArrayList<Integer>> new_states = new ArrayList<ArrayList<Integer>>();
@@ -812,15 +827,14 @@ class NFA {
                     if (a.size() > 0) {
                         if (!Q.contains(a)) {
                             Q.add(a);
-
                             new_states.add(a);
-                            HashMap<Integer, ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
-                            if (tmp == null) {
-                                tmp = new HashMap<Integer, ArrayList<Integer>>();
-                            }
-                            tmp.put(j, a);
-                            new_transitions.put(new_states.get(0), tmp);
                         }
+                        HashMap<Integer, ArrayList<Integer>> tmp = new_transitions.get(new_states.get(0));
+                        if (tmp == null) {
+                            tmp = new HashMap<Integer, ArrayList<Integer>>();
+                        }
+                        tmp.put(j, a);
+                        new_transitions.put(new_states.get(0), tmp);
                     }
                 }
             }
@@ -836,7 +850,6 @@ class NFA {
 
         return new DFA(Q, Sigma, get_states(Q, q0), get_states(Q, f), new_transitions);
     }
-
     public boolean has_start_state(ArrayList<Integer> arr, int s) {
         for (int a : arr) {
             if (a == s) {
@@ -1030,6 +1043,9 @@ class DFA {
         System.out.println(Transitions);
     }
 }
+
+
+
 
 
 
