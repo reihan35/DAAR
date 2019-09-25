@@ -1,4 +1,3 @@
-
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -306,7 +305,6 @@ public class RegEx {
             // Scanner scanner = new Scanner(System.in);
             // System.out.print("  >> Please enter a regEx: ");
             // regEx = scanner.next();
-            // regEx = "S(a|g|r)*on";
             regEx = "S(a|g|r)*on";
         }
         System.out.println("  >> Parsing regEx \"" + regEx + "\".");
@@ -330,11 +328,12 @@ public class RegEx {
                 DFA d = n.to_DFA();
                 d.print();
 
+                /*
                 System.out.println("0 ***********************************************");
                 System.out.println("  >> Here is the DFA min of the tree : ");
                 d.minDFA();
                 d.print();
-                System.out.println("1 ***********************************************");
+                */
 
                 String file = "./res/fileData.txt";
 
@@ -344,32 +343,28 @@ public class RegEx {
                 String file = scanner.next();
                 */
 
-
-                // tester un exemple local
                 // String text = "atroSagrgaronBabyloniaSagrjaion"
-                String text = "Saont";
+                String text = " This eBook is for the use of anyone anywhere in the United States and most";
+                // text = "Sonder";
                 // text = "arbbccct";
                 // String text = "line: past may have caused the flooding of the left bank above E-Sagila.[57]";
                 // d.search(text);
 
-                System.out.println("2 ***********************************************");
-
+                boolean oui = true;
                 Search search = new Search();
-                System.out.println("3 ***********************************************");
-                // regEx = "chicha";
                 ArrayList wordMatch = new ArrayList<>();
-                if(isRegex(regEx)){
-                    System.out.println("4 ***********************************************");
+                if(isRegex(regEx) && oui){
                     if (regEx.contains("a")) {
-                        System.out.println("5 ***********************************************");
+                        System.out.println("....IF.....");
                         System.out.println(" regEx: " + regEx);
                         // dans le cas où '\n' est dans l'expréssion régulière
-                        // String text = readFileChar("./res/fileData.txt");
+                        text = search.readFileChar("./res/fileData.txt");
+                        System.out.println(" text: " + text);
                         search.searchWithDFA(d, text);
-                        System.out.println("6 ***********************************************");
                     } else {
                         // la methode est plus rapide
-                        // readFileLine(file, d);
+                        System.out.println("....ELSE.....");
+                        readFileLine(file, d, search);
                     }
                 }else{
                     int [] retenue = search.retenue(regEx);
@@ -398,6 +393,20 @@ public class RegEx {
         System.out.println("  >> ...");
         System.out.println("  >> Parsing completed.");
         System.out.println("Goodbye Mr. Anderson.");
+    }
+
+    public static void readFileLine(String file, DFA d, Search search) throws FileNotFoundException {
+        ArrayList<String> resutls = new ArrayList<String>();
+        try {
+            Scanner scanner = new Scanner(new File(file));
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                System.out.println("line: " + line);
+                search.searchWithDFA(d, line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static boolean isRegex(String str){
@@ -1037,201 +1046,6 @@ class DFA {
 
 
 
-class Search{
 
-    // etape 5
-    public ArrayList<String> searchWithDFA(DFA dfa, String txt) {
-        System.out.println("........ text : " + txt);
-        int N = txt.length();
-        ArrayList<String> resutls = new ArrayList<String>();
-        ArrayList<Integer> currentState = null;
-        ArrayList<Integer> nextState = null;
-        String currentChar = "";
-        String maxMatching = "";
-
-        boolean change = false;
-        System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-        for (ArrayList<Integer> state : dfa.q0) {
-            for (int i = 0; i < N; i++) {
-
-                if (dfa.Transitions.containsKey(state)) {
-                    currentState = dfa.Transitions.get(state).get((int) txt.charAt(i));
-                    System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    System.out.println("i : " + txt.charAt(i));
-                    System.out.println("currentState: " + currentState);
-
-                    if (currentState != null) {
-                        System.out.println("1 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                        System.out.println("i+1 : " + txt.charAt(i+1));
-                        dfa.Transitions.get(currentChar)
-                        nextState = dfa.Transitions.get(currentChar).get((int) txt.charAt(i+1));
-                        System.out.println("2 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                        if (dfa.f.contains(currentState) && nextState==null) {
-                            System.out.println("    nextState: " + currentState);
-
-                            currentChar = currentChar + txt.charAt(i);
-                            System.out.println(" >>>> currentChar : " + currentChar);
-
-                            resutls.add(currentChar);
-                            if (maxMatching.length() < currentChar.length())
-                                maxMatching = currentChar;
-                            currentChar = "";
-                        }else if (dfa.Transitions.containsKey(currentState) && i < N - 1) {
-                            System.out.println(" 1 *** currentChar : " + currentChar);
-                            /*
-
-                            if (!dfa.f.contains(currentState)) {
-                                System.out.println(" 2 *** currentChar : " + currentChar);
-                                currentChar = currentChar + txt.charAt(i);
-                                nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
-                                System.out.println(" 3 *** currentChar : " + currentChar);
-                                if (nextState != null)
-                                    currentChar = currentChar + txt.charAt(i + 1);
-                                else
-                                    currentChar = "";
-
-                                System.out.println("    0 next txt: " + txt.charAt(i + 1));
-
-                                change = false;
-
-                                while (nextState != null && i < N - 1) {
-                                    currentState = nextState;
-
-                                    change = true;
-                                    i += 1;
-                                    System.out.println("    1 current txt: " + txt.charAt(i));
-                                    System.out.println("    0 next txt: " + txt.charAt(i + 1));
-                                    nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i));
-                                    if (nextState != null) {
-                                        currentChar = currentChar + txt.charAt(i + 1);
-                                        System.out.println("    1 next txt: " + txt.charAt(i + 1));
-                                    }
-                                    System.out.println("    1 currentChar: " + currentChar);
-                                }
-                                if (nextState == null && change){
-                                    i -= 1;
-                                    currentState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
-                                    System.out.println(" >>>> nextState : " + nextState);
-                                    if(dfa.f.contains(nextState)){
-                                        resutls.add(currentChar);
-                                        if (maxMatching.length() < currentChar.length())
-                                            maxMatching = currentChar;
-                                    }
-                                    currentChar = "";
-                                }
-                            }else{
-                                System.out.println(" 2 >>>> currentChar : " + currentChar);
-                                resutls.add(currentChar);
-                                if (maxMatching.length() < currentChar.length())
-                                    maxMatching = currentChar;
-                                currentChar = "";
-                            }*/
-                        }
-                    }
-                }
-            }
-        }
-        if (resutls.size() != 0) {
-            System.out.println("results: " + resutls);
-            System.out.println("maxMatching in this line (texte): " + maxMatching);
-        }
-
-        return resutls;
-    }
-
-    public int [] retenue(String str){
-        int [] retenue = new int [str.length()];
-        char[]facteur = str.toCharArray();
-
-        int currentIdx = 0;
-        int value = 0;
-        int j = 1;
-
-        for (int i=0; i<facteur.length; i++) {
-            value = 0;
-            if (facteur[i] == facteur[0]) {
-                retenue[currentIdx] = -1;
-                currentIdx += 1;
-            }else if(currentIdx == 1) {
-                currentIdx ++;
-                retenue[currentIdx] = 0;
-            }else{
-                j = 1;
-                while (j <= currentIdx-j+1) {
-                    if(str.substring(0,j).equals(str.substring(currentIdx-j,currentIdx))) {
-                        value = j;
-                    }
-                    j++;
-                }
-
-                retenue[currentIdx] = value;
-                currentIdx += 1;
-            }
-        }
-        return retenue;
-    }
-
-    public int matchingWords(char[] facteur, int[] retenue, char[] texte) {
-        int i = 0;
-        int j = 0;
-
-        while(i < texte.length) {
-            if (j==facteur.length)
-                return (i-facteur.length);
-
-
-            if(texte[i] == facteur[j]) {
-                i++;
-                j++;
-            }
-
-            else {
-                if(retenue[j] == -1) {
-                    i++;
-                    j=0;
-                }
-                else {
-                    j = retenue[j];
-                }
-            }
-
-        }
-
-        if(j==facteur.length)
-            return i-facteur.length;
-
-        else
-            return -1;
-
-    }
-
-    public static void readFileLine(String file, DFA d) throws FileNotFoundException {
-        ArrayList<String> resutls = new ArrayList<String>();
-        try {
-            Scanner scanner = new Scanner(new File(file));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                // d.search(line);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String readFileChar(String file) throws FileNotFoundException {
-        String result = "";
-        try {
-            FileReader fr = new FileReader(file);
-            int i;
-            while ((i = fr.read()) != -1)
-                result += (char) i;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-}
 
 
