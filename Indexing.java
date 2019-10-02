@@ -42,15 +42,16 @@ public class Indexing{
         System.out.println(trie.search("bo"));
         File f = new File("cash");
         trie.insertFromFile(f);*/
-        File file = new File("text1");
+        /*File file = new File("text1");
         File cash = new File("cash");
         try{
             makeCash(FileToStrings(file));
         }catch(Exception e){
             System.out.println("ERREUR" + e);
-        }
+        }*/
+        File cash = new File("cash");
         Trie t = trieFromFile(cash);
-        System.out.println(t.search("Shagarakti-Shuriash"));
+        System.out.println(t.search("Sargon"));
 
     }
 
@@ -106,18 +107,41 @@ public class Indexing{
         
         int index = 0;
         int cpt = 1;
+        ArrayList<Character> separators = new ArrayList<Character>();
+        separators.add(' ');
+        separators.add(',');
+        separators.add('+');
+        separators.add('*');
+        separators.add('"');
+        separators.add('.');
+        separators.add(':');
+        separators.add(';');
+        separators.add('#');
+        separators.add('(');
+        separators.add(')');
+        separators.add('[');
+        separators.add(']');
+        separators.add('=');
+        separators.add('_');
+        separators.add('&');
+        separators.add('\'');
 
         for(int j=0; j<lines.size(); j++){
             String s = lines.get(j); 
             cpt = 1;
             for (int i=0; i<s.length();i++){
                     char c = s.charAt(i);
-
-                    if (c == ' ' || i==s.length()-1){
+                    if(Character.isDigit(c)){
+                        break;
+                    }
+                    if (separators.contains(c) || i==s.length()-1){
                         String mot = "";
                         ArrayList<Integer> tuple = new ArrayList<Integer>();
-                        if (i==s.length()-1){
+                        if (separators.contains(c)==false && i==s.length()-1){
                             mot = s.substring(i-(cpt-1),i+1);
+                            if(mot.length() == 1 || (mot.length() == 2 && mot.charAt(0)==' ' || mot.charAt(1)== ' ')){
+                                break;
+                            }
                             tuple.add(j+1); //numero de ligne
                             //System.out.println();
                             tuple.add((i+1)-(cpt-1));
