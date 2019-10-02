@@ -42,16 +42,15 @@ public class Indexing{
         System.out.println(trie.search("bo"));
         File f = new File("cash");
         trie.insertFromFile(f);*/
-        /*File file = new File("text1");
+        File file = new File("text1");
         File cash = new File("cash");
         try{
             makeCash(FileToStrings(file));
         }catch(Exception e){
             System.out.println("ERREUR" + e);
-        }*/
-        File cash = new File("cash");
+        }
         Trie t = trieFromFile(cash);
-        System.out.println(t.search("Sargon"));
+        System.out.println(t.search("sargon"));
 
     }
 
@@ -318,7 +317,12 @@ class Trie {
         TrieNode node = null;
         for(int i = 0; i < word.length(); i++) {
             char c = word.charAt(i);
-            if(children.containsKey(c)) {
+			System.out.println(Character.toLowerCase(c));
+			System.out.println(Character.toUpperCase(c));
+			System.out.println(Character.toUpperCase(c));
+            if(children.containsKey(c) || children.containsKey(Character.toUpperCase(c))) {
+				System.out.println(Character.toLowerCase(c));
+				System.out.println(Character.toUpperCase(c));
                 node = children.get(c);
                 children = node.getChildren();
             } else { 
