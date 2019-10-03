@@ -50,7 +50,7 @@ public class Indexing{
             System.out.println("ERREUR" + e);
         }
         Trie t = trieFromFile(cash);
-        System.out.println(t.search("sargon"));
+        System.out.println(t.search("Sargon"));
 
     }
 
@@ -124,6 +124,7 @@ public class Indexing{
         separators.add('_');
         separators.add('&');
         separators.add('\'');
+        separators.add('-');
 
         for(int j=0; j<lines.size(); j++){
             String s = lines.get(j); 
@@ -138,9 +139,6 @@ public class Indexing{
                         ArrayList<Integer> tuple = new ArrayList<Integer>();
                         if (separators.contains(c)==false && i==s.length()-1){
                             mot = s.substring(i-(cpt-1),i+1);
-                            if(mot.length() == 1 || (mot.length() == 2 && mot.charAt(0)==' ' || mot.charAt(1)== ' ')){
-                                break;
-                            }
                             tuple.add(j+1); //numero de ligne
                             //System.out.println();
                             tuple.add((i+1)-(cpt-1));
@@ -153,13 +151,18 @@ public class Indexing{
 
                         }
                     //System.out.println(mot);
-                    ArrayList<ArrayList<Integer>> t = occurences.get(mot);
+                    String mot2 = "";
+                    for (int l = 0;l<mot.length();l++){
+                        Character c2 = mot.charAt(l);
+                        mot2 = mot2 + Character.toLowerCase(c2);
+                    }
+                    ArrayList<ArrayList<Integer>> t = occurences.get(mot2);
                     if (t == null){
                          t = new ArrayList<ArrayList<Integer>>();
                     }
 
                     t.add(tuple);
-                    occurences.put(mot,t);
+                    occurences.put(mot2,t);
                     cpt = 1;
                     //System.out.println(occurences);
                 }
@@ -206,7 +209,7 @@ public class Indexing{
                     c = line.charAt(i++);
                     mot = mot + c;    
                 }
-                System.out.println(mot);
+                //System.out.println(mot);
                 mot = mot.substring(0,i-2);
 
                 ArrayList a = new ArrayList<ArrayList<Integer>>();
@@ -315,14 +318,14 @@ class Trie {
         HashMap<Character, TrieNode> children = root.getChildren();
         //System.out.println(children);
         TrieNode node = null;
-        for(int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-			System.out.println(Character.toLowerCase(c));
-			System.out.println(Character.toUpperCase(c));
-			System.out.println(Character.toUpperCase(c));
-            if(children.containsKey(c) || children.containsKey(Character.toUpperCase(c))) {
-				System.out.println(Character.toLowerCase(c));
-				System.out.println(Character.toUpperCase(c));
+         String mot = "";
+        for (int i = 0;i<word.length();i++){
+            Character c = word.charAt(i);
+            mot = mot + Character.toLowerCase(c);
+        }
+        for(int i = 0; i < mot.length(); i++) {
+            char c = mot.charAt(i);
+            if(children.containsKey(c)) {
                 node = children.get(c);
                 children = node.getChildren();
             } else { 
