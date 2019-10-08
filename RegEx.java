@@ -298,103 +298,131 @@ public class RegEx {
 }*/
 
     public static void main(String arg[]) throws Exception {
-        System.out.println("Welcome to Bogota, Mr. Thomas Anderson.");
-        if (arg.length != 0) {
+        if (arg.length == 0) {
+           return;
+        } else {
             regEx = arg[0];
-        } else {
-            // Scanner scanner = new Scanner(System.in);
-            // System.out.print("  >> Please enter a regEx: ");
-            // regEx = scanner.next();
-            regEx = "S(a|g|r)*on";
-        }
-        System.out.println("  >> Parsing regEx \"" + regEx + "\".");
-        System.out.println("  >> ...");
+            String fileName = arg[1];
+            //System.out.println("  >> Parsing regEx \"" + regEx + "\".");
+            //System.out.println("  >> ...");
 
-        if (regEx.length() < 1) {
-            System.err.println("  >> ERROR: empty regEx.");
-        } else {
+            if (regEx.length() < 1) {
+                System.err.println("  >> ERROR: empty regEx.");
+            } else {
+                //for (int i = 1; i < regEx.length(); i++) System.out.print("," + (int) regEx.charAt(i));
+                try {
+                    Search search = new Search();
+                    ArrayList wordMatch = new ArrayList<>();
+                    //String text = "This eBook is for the use of anyone anywhere in the United States and most";
+                    String text = "hey I was keep1ing that";
+                    if(isRegex(regEx)){
+                        RegExTree ret = parse();
+                        System.out.println("  >> Tree result: " + ret.toString() + ".");
+                        System.out.println("  >> Here is the NFA of the tree : ");
+                        NFA n = ret.toAutomaton();
+                        n.print();
+                        System.out.println("  >> Here is the DFA of the tree : ");
+                        DFA d = n.to_DFA();
+                        d.print();
+                        
+                        if(isRegex(regEx)){
+                            if (regEx.contains("a")) {
+                                System.out.println("....IF.....");
+                                System.out.println(" regEx: " + regEx);
+                                // dans le cas où '\n' est dans l'expréssion régulière
+                                text = search.readFileChar(fileName);
+                                System.out.println(" text: " + text);
+                                search.searchWithDFA(d, text);
+                            } else {
+                                // la methode est plus rapide
+                                System.out.println("....ELSE.....");
+                                readFileLine(fileName, d, search);
+                            }
 
-            System.out.print("  >> ASCII codes: [" + (int) regEx.charAt(0));
-            for (int i = 1; i < regEx.length(); i++) System.out.print("," + (int) regEx.charAt(i));
-            System.out.println("].");
-            try {
-
-                RegExTree ret = parse();
-                System.out.println("  >> Tree result: " + ret.toString() + ".");
-                System.out.println("  >> Here is the NFA of the tree : ");
-                NFA n = ret.toAutomaton();
-                n.print();
-                System.out.println("  >> Here is the DFA of the tree : ");
-                DFA d = n.to_DFA();
-                d.print();
-
-                /*
-                System.out.println("0 ***********************************************");
-                System.out.println("  >> Here is the DFA min of the tree : ");
-                d.minDFA();
-                d.print();
-                */
-
-                String file = "./res/fileData.txt";
-
-                /*
-                Scanner scanner = new Scanner(System.in);
-                System.out.print("  >> Please enter the name of your file: ");
-                String file = scanner.next();
-                */
-
-                // String text = "atroSagrgaronBabyloniaSagrjaion"
-                String text = " This eBook is for the use of anyone anywhere in the United States and most";
-                // text = "Sonder";
-                // text = "arbbccct";
-                // String text = "line: past may have caused the flooding of the left bank above E-Sagila.[57]";
-                // d.search(text);
-
-                boolean oui = true;
-                Search search = new Search();
-                ArrayList wordMatch = new ArrayList<>();
-                if(isRegex(regEx) && oui){
-                    if (regEx.contains("a")) {
-                        System.out.println("....IF.....");
-                        System.out.println(" regEx: " + regEx);
-                        // dans le cas où '\n' est dans l'expréssion régulière
-                        text = search.readFileChar("./res/fileData.txt");
-                        System.out.println(" text: " + text);
-                        search.searchWithDFA(d, text);
-                    } else {
-                        // la methode est plus rapide
-                        System.out.println("....ELSE.....");
-                        readFileLine(file, d, search);
                     }
                 }else{
-                    int [] retenue = search.retenue(regEx);
-                    int lastIdx = 0;
-
-                    int result = search.matchingWords(regEx.toCharArray(), retenue, text.toCharArray());
-                    if(result!=-1)
-                        wordMatch.add(result);
-
-                    while(result != -1){
-                        lastIdx = result + regEx.length();
-                        text = text.substring(result+regEx.length()+1, text.length());
-                        result = search.matchingWords(regEx.toCharArray(), retenue, text.toCharArray());
-                        if(result!=-1)
-                            wordMatch.add(lastIdx + result);
+                    File file2 = new File(fileName);
+                    File cache = new File("cache_"+fileName);
+                    if (Indexing.toHashInt(Indexing.FileToStrings(file2)).get(regEx) != null){
+                        if (!cache.exists()){
+                             try{
+                                Indexing.makeCash(Indexing.FileToStrings(file2),fileName);
+                            }catch(Exception e){
+                                System.out.println("ERREUR" + e);
+                            }
+                        }
+                    
+                    Trie t = Indexing.trieFromFile(cache);
+                    printWordsInColor(regEx,FileToStrings(file2),t.search(regEx));
                     }
+                    else{
+                        System.out.println("&&&&&&&&&&&&&");
+                        int [] retenue = search.retenue(regEx);
+                        int lastIdx = 0;
 
-                    System.out.println("word match: " + wordMatch);
+                        int result = search.matchingWords(regEx.toCharArray(), retenue, text.toCharArray());
+                        if(result!=-1)
+                            wordMatch.add(result);
+
+                        while(result != -1){
+                            lastIdx = result + regEx.length();
+                            text = text.substring(result+regEx.length()+1, text.length());
+                            result = search.matchingWords(regEx.toCharArray(), retenue, text.toCharArray());
+                            if(result!=-1)
+                                wordMatch.add(lastIdx + result);
+                        }
+
+                        System.out.println("word match: " + wordMatch);
+
+                    }
                 }
-
+                   
             } catch (Exception e) {
                 System.err.println("  >> ERROR: syntax error for regEx \"" + regEx + "\". "+ e);
             }
         }
+    }
+}
+    
 
-        System.out.println("  >> ...");
-        System.out.println("  >> Parsing completed.");
-        System.out.println("Goodbye Mr. Anderson.");
+    public static ArrayList<String> FileToStrings(File fileName){
+        try {
+            String line = null;
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            Trie t = new Trie();
+            ArrayList<String> strings = new ArrayList<String>();
+
+            while((line = bufferedReader.readLine()) != null) {
+                strings.add(line);
+            }
+            return strings;
+
+        }
+        catch(Exception e){
+            return null;
+        }
     }
 
+    public static void printWordsInColor(String reg,ArrayList<String> lines,ArrayList<ArrayList<Integer>> ti){
+        String ANSI_RESET = "\u001B[0m";
+        String ANSI_RED = "\u001B[42m";
+        for(int i = 0 ; i<ti.size();i++){
+                //System.out.println("je rentre");
+                Object lineNumt = ti.get(i).get(0);
+                String s = (String)lineNumt;
+                int lineNum = Integer.parseInt(s);
+                Object indext = ti.get(i).get(1);
+                String s2 = (String)indext;
+                s2 = s2.substring(1,s2.length());
+                int index = Integer.parseInt(s2);
+               // System.out.println(index);
+                String line = lines.get(lineNum-1);
+                System.out.println(line.substring(0,index-1) + ANSI_RED + line.substring(index-1,index+reg.length()-1) + ANSI_RESET + line.substring(index+reg.length()-1,line.length()));
+        
+        }
+    }
+   
     public static void readFileLine(String file, DFA d, Search search) throws FileNotFoundException {
         ArrayList<String> resutls = new ArrayList<String>();
         try {

@@ -25,7 +25,7 @@ public class IndexingRadix{
         }catch(Exception e){
             System.out.println("erreur");
         }*/
-        Trie trie = new Trie();
+        /*Trie trie = new Trie();
         ArrayList<Integer> ar1 = new ArrayList<Integer>();
         ar1.add(1);
         ar1.add(1);
@@ -39,25 +39,25 @@ public class IndexingRadix{
         ar4.add(ar2);
         trie.insert("bonjour",ar3);
         trie.insert("bon",ar4);
-		System.out.println(trie.search("bonjour"));
-        //System.out.println(trie.search("bo"));
-        //File f = new File("cash");
-        //trie.insertFromFile(f);
-        /*File file = new File("text1");
+		System.out.println(trie.search("bn"));*/
+        /*System.out.println(trie.search("bo"));
+        File f = new File("cash");
+        trie.insertFromFile(f);*/
+        File file = new File("text1");
         File cash = new File("cash");
         try{
-            makeCash(FileToStrings(file));
+            makeCash(FileToStrings(file),"texte1");
         }catch(Exception e){
             System.out.println("ERREUR" + e);
         }
         Trie t = trieFromFile(cash);
-        System.out.println(t.search("Sargon"));*/
+        System.out.println(t.search("SaRgon"));
 
     }
 
-    public static void makeCash(ArrayList<String> s) throws Exception{
+    public static void makeCash(ArrayList<String> s, String filename) throws Exception{
         HashMap<String,ArrayList<ArrayList<Integer>>> occurences = toHashMap(s);
-        PrintWriter writer = new PrintWriter("cash", "UTF-8");
+        PrintWriter writer = new PrintWriter("cash" + filename, "UTF-8");
         
         List ListofKeys = new ArrayList(sortByValue(toHashInt(s)).keySet());
         for (int i=0; i<ListofKeys.size();i++){
@@ -157,6 +157,9 @@ public class IndexingRadix{
                         Character c2 = mot.charAt(l);
                         mot2 = mot2 + Character.toLowerCase(c2);
                     }
+                    /*if (mot2.length()<3){
+                        break;
+                    }*/
                     ArrayList<ArrayList<Integer>> t = occurences.get(mot2);
                     if (t == null){
                          t = new ArrayList<ArrayList<Integer>>();
@@ -212,7 +215,6 @@ public class IndexingRadix{
                 }
                 //System.out.println(mot);
                 mot = mot.substring(0,i-2);
-
                 ArrayList a = new ArrayList<ArrayList<Integer>>();
                 char d = line.charAt(0);
                 String tuple = "";
@@ -255,16 +257,16 @@ public class IndexingRadix{
 }
 
 class TrieNode {
-    private String c;
+    //private String c;
     private HashMap<Character, TrieNode> children = new HashMap<>();
     private ArrayList<ArrayList<Integer>> wordOccurences;
 
     public TrieNode() {}
 
-    public TrieNode(String c){
+    /*public TrieNode(String c){
         this.c = c;
         wordOccurences = null;
-    }
+    }*/
 
     public HashMap<Character, TrieNode> getChildren() {
         return this.children;
@@ -300,16 +302,23 @@ class Trie {
 			System.out.println(current);
     	}
    	 	current.setWordOc(occ);
-		System.out.println(current.getWordOccurences());
+		//System.out.println(current.getWordOccurences());
 	}
 
 
     public ArrayList<ArrayList<Integer>> search(String word) {
     	TrieNode current = root;
-    	for (int i = 0; i < word.length(); i++) {
-        	char ch = word.charAt(i);
+         String mot = "";
+        for (int i = 0;i<word.length();i++){
+            Character c = word.charAt(i);
+            mot = mot + Character.toLowerCase(c);
+        }
+    	for (int i = 0; i < mot.length(); i++) {
+        	char ch = mot.charAt(i);
         	TrieNode node = current.getChildren().get(ch);
+            System.out.println(ch);
         	if (node == null) {
+                System.out.println("je rentre la");
             	return null;
         	}
         	current = node;

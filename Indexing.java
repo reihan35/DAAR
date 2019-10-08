@@ -43,9 +43,9 @@ public class Indexing{
         File f = new File("cash");
         trie.insertFromFile(f);*/
         File file = new File("text1");
-        File cash = new File("cash");
+        File cash = new File("cache_text1");
         try{
-            makeCash(FileToStrings(file));
+            makeCash(FileToStrings(file),"text1");
         }catch(Exception e){
             System.out.println("ERREUR" + e);
         }
@@ -54,9 +54,9 @@ public class Indexing{
 
     }
 
-    public static void makeCash(ArrayList<String> s) throws Exception{
+    public static void makeCash(ArrayList<String> s, String filename) throws Exception{
         HashMap<String,ArrayList<ArrayList<Integer>>> occurences = toHashMap(s);
-        PrintWriter writer = new PrintWriter("cash", "UTF-8");
+        PrintWriter writer = new PrintWriter("cache_" + filename, "UTF-8");
         
         List ListofKeys = new ArrayList(sortByValue(toHashInt(s)).keySet());
         for (int i=0; i<ListofKeys.size();i++){
@@ -254,15 +254,19 @@ public class Indexing{
 }
 
 class TrieNode {
-    private char c;
+    private Character c;
     private HashMap<Character, TrieNode> children = new HashMap<>();
     private ArrayList<ArrayList<Integer>> wordOccurences;
 
     public TrieNode() {}
 
-    public TrieNode(char c){
+    public TrieNode(Character c){
         this.c = c;
         wordOccurences = null;
+    }
+
+    public Character getContent(){
+        return c;
     }
 
     public HashMap<Character, TrieNode> getChildren() {
@@ -280,6 +284,35 @@ class TrieNode {
     public void setWordOc(ArrayList<ArrayList<Integer>> wo) {
         this.wordOccurences = wo;
     }
+    /*private HashMap<String, TrieNode> children = new HashMap<>();
+    private ArrayList<ArrayList<Integer>> wordOccurences;
+
+    public TrieNode() {}
+
+    public TrieNode(String c){
+        this.c = c;
+        wordOccurences = null;
+    }
+
+    public String getContent(){
+        return c;
+    }
+
+    public HashMap<String, TrieNode> getChildren() {
+        return this.children;
+    }
+
+    public void setChildren(HashMap<String, TrieNode> children) {
+        this.children = children;
+    }
+
+    public ArrayList<ArrayList<Integer>> getWordOccurences() {
+        return this.wordOccurences;
+    }
+
+    public void setWordOc(ArrayList<ArrayList<Integer>> wo) {
+        this.wordOccurences = wo;
+    }*/
 }
 
 class Trie {
@@ -290,18 +323,50 @@ class Trie {
         root = new TrieNode();
     }
 
+    /*public Stirng upToHere(String s,HashMap<String, TrieNode> children){
+        Iterator it = mp.entrySet().iterator();
+        int cpt = 0;
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if(pair.getKey().length() < s.length()){
+                for(int i = 0; i <s.length(); i++){
+                    if (pair.getKey().charAt(i)==s.charAt(i)){
+                        cpt++;
+                    }
+                }
+            }
+            else {
+                for(int i = 0; i < pair.getKey().length(); i++){
+                    if (pair.getKey().charAt(i)==s.charAt(i)){
+                        cpt++;
+                    }itories 6 follow
+                }
+            }
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        return cpt;
+    }
+
     public void insert(String word, ArrayList<ArrayList<Integer>> occ) {
         HashMap<Character, TrieNode> children = root.getChildren();
         //System.out.println("AHAHAHAHAH");
         //System.out.println(word);
         //System.out.println(occ);
+        String node_bef = "";
+        int cpt = upToHere(word,children)
+        if(cpt < word.length()){
+            node = node.getChildren().get();
+
+        }
         for(int i = 0; i < word.length(); i++) {
             char c = word.charAt(i);
             TrieNode node;
             if(children.containsKey(c)) {
                 node = children.get(c);
             } else { 
-                node = new TrieNode(c);
+                node = new TrieNode(node_bef+c);
+                node_bef = node.getContent();
+                System.out.println(node_bef);
                 children.put(c, node);
             }
             children = node.getChildren();
@@ -338,8 +403,67 @@ class Trie {
         } else {
             return null;
         }
+    }*/
+    
+
+    public void insert(String word, ArrayList<ArrayList<Integer>> occ) {
+        HashMap<Character, TrieNode> children = root.getChildren();
+        //System.out.println("AHAHAHAHAH");
+        //System.out.println(word);
+        //System.out.println(occ);
+        for(int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            TrieNode node;
+            if(children.containsKey(c)) {
+                node = children.get(c);
+            } else { 
+                node = new TrieNode(c);
+                //System.out.println(node_bef);
+                children.put(c, node);
+            }
+            children = node.getChildren();
+
+            if(i == word.length() - 1) {
+               //System.out.println("!!!!!!!" + occ);
+                node.setWordOc(occ);
+            }
+
+        }
     }
 
-
-
-}
+    public ArrayList<ArrayList<Integer>> search(String word) {
+        HashMap<Character, TrieNode> children = root.getChildren();
+        //System.out.println(children);
+        ArrayList<Character> a = new ArrayList<Character>();
+        TrieNode node = null;
+         String mot = "";
+        for (int i = 0;i<word.length();i++){
+            Character c = word.charAt(i);
+            mot = mot + Character.toLowerCase(c);
+        }
+        for(int i = 0; i < mot.length(); i++) {
+            char c = mot.charAt(i);
+            if(children.containsKey(c)) {
+                node = children.get(c);
+                children = node.getChildren();
+            } else { 
+                node = null;
+                break;
+            }
+        }
+        if(node != null && node.getWordOccurences()!=null && node.getChildren().size()==0 ) {
+            return node.getWordOccurences();
+        } else {
+            if(node!=null && node.getChildren().size()>0){
+                ArrayList<ArrayList<Integer>> wo= new ArrayList<ArrayList<Integer>>();
+                if(node.getWordOccurences()!=null)
+                    wo.addAll(node.getWordOccurences());
+                for (Character c : node.getChildren().keySet()) {
+                    wo.addAll(search(mot + Character.toString(c)));
+                }
+                return wo;
+            }
+            return null;
+            }
+        }
+ }
