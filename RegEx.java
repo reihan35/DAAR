@@ -32,7 +32,7 @@ public class RegEx {
 			String fileName = arg[1];
 			// System.out.println(" >> Parsing regEx \"" + regEx + "\".");
 			// System.out.println(" >> ...");
-			regEx = "S(a|g|r)*on";
+			regEx = "SaSaSa(a|g|r)*on";
 			// regEx = "h(a|a)nd";
 			if (regEx.length() < 1) {
 				System.err.println("  >> ERROR: empty regEx.");
@@ -72,15 +72,15 @@ public class RegEx {
 								System.out.println("....ELSE.....");
 								ArrayList<String> l = new ArrayList<>();
 								
-								String text1 = "truksdjfb lkfbez kfbSargon qkjfre";
-								String text2 = "tsgegerrg regre goSarn Sargonqkjfre";
-								String text3 = "Sargon qkjfre";
+								String text1 = "truksdjfb lkfbez kfbSaSaSargon qkjfre";
+								String text2 = "tsgegerrg regre goSarn SaSaSargonqkjfre";
+								String text3 = "SaSaSaSargon qkjfre";
 								
-								l.add(text1);
-								l.add(text2);
+								// l.add(text1);
+								// l.add(text2);
 								l.add(text3);
 								
-								ArrayList<ArrayList<Integer>> result = mainM1(l,d);
+								HashMap<String, ArrayList<ArrayList<Integer>>> result = mainM1(l,d);
 							}
 						}
 					} else {
@@ -102,7 +102,7 @@ public class RegEx {
 						} else {
 							// KMP (method 2)
 							ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-							printWordsInColorKMP(regEx,FileToStrings(file2),result);
+							// printWordsInColorKMP(regEx,FileToStrings(file2),result);
 
 						}
 					}
@@ -114,22 +114,18 @@ public class RegEx {
 		}
 	}
 
-	public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
-		System.out.println("0 je suis la : " );
-		ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+	public static HashMap<String, ArrayList<ArrayList<Integer>>> mainM1(ArrayList<String> lines, DFA d) {
+		HashMap<String, ArrayList<ArrayList<Integer>>> result = new HashMap<String, ArrayList<ArrayList<Integer>>>(); 
 		Search search = new Search();
-		System.out.println("1 je suis la : " );
 		
 		int i =0;
 		for (String line : lines) {
-			System.out.println("		2 je suis la : " );
 			i++;
-			ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
-			if(matching.size()>0)
-				result.addAll(matching);
+			HashMap<String, ArrayList<ArrayList<Integer>>> matching = search.searchWithDFA(d, line, i, 0);
+			if(matching.size()>0) {
+				matching.forEach((k, v) -> result.computeIfAbsent(k, k2 -> new ArrayList<>()).addAll((v)));
+			}
 		}
-		System.out.println("3 je suis la : " );
-
 		System.out.println("[M1] word match: " + result);
 		return result;
 	}
