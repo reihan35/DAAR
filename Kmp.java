@@ -29,17 +29,4 @@ public class Kmp{
         //retenus[1] = 0;
         return retenus;
     }
-
-   public static void main(String[] args){
-       // char[] facteur = {'m','a','m','a','m','i','a'}; 
-        char[] facteur = {'c','h','i','c','h','a'}; 
-
-        int [] result = retenu(facteur);
-        for(int i=0; i< result.length; i++)
-            System.out.print(result[i] + ", ");
-    } 
 }
-
-/*public int mathcingALgo(){
-
-}*/

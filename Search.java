@@ -1,21 +1,17 @@
-import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.lang.Exception;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.HashSet;
-import java.util.*;
 import java.io.*;
 
 
 public class Search {
 
     // etape 5
-    public ArrayList<String> searchWithDFA(DFA dfa, String txt) {
+    public ArrayList<ArrayList<Integer>> searchWithDFA(DFA dfa, String txt, int idLine, int idCol) {
         // System.out.println("........ text : " + txt);
         int N = txt.length();
-        ArrayList<String> resutls = new ArrayList<String>();
+        ArrayList<String> resutls = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> resutlsF = new ArrayList<ArrayList<Integer>>();
+
         ArrayList<Integer> currentState = null;
         ArrayList<Integer> nextState = null;
         String currentChar = "";
@@ -48,7 +44,11 @@ public class Search {
 
                             currentChar = currentChar + txt.charAt(i);
                             // System.out.println(" >>>> currentChar : " + currentChar);
-
+                            
+                            ArrayList<Integer> elem = new ArrayList<>();
+                        	elem.add(idLine);
+                        	elem.add(i-currentChar.length()+3);
+                        	resutlsF.add(elem);
                             resutls.add(currentChar);
                             change = false;
                             if (maxMatching.length() < currentChar.length())
@@ -115,6 +115,12 @@ public class Search {
                                     // System.out.println(" >>>> dfa.f. : " + dfa.f);
                                     if (dfa.f.contains(currentState)) {
                                         //  System.out.println("    je suis accepté : " + currentChar);
+                                    	System.out.println("txt.charAt(i); : " + txt.charAt(i));
+                                        System.out.println("i : " + i);
+                                    	ArrayList<Integer> elem = new ArrayList<>();
+                                    	elem.add(idLine);
+                                    	elem.add(i-currentChar.length()+3);
+                                    	resutlsF.add(elem);
                                         resutls.add(currentChar);
                                         currentChar = "";
                                         change = false;
@@ -127,6 +133,13 @@ public class Search {
                                 }
                             } else {
                                 // System.out.println(" 2 >>>> currentChar : " + currentChar);
+                            	ArrayList<Integer> elem = new ArrayList<>();
+                            	elem.add(idLine);
+                            	// 1 : currentChar.length() = wordToSearch.length()-1
+                            	// pour currentChar.length()- 1
+                            	// 1 pour commencer de 1 et non de 0
+                            	elem.add(i-currentChar.length()+3);
+                            	resutlsF.add(elem);
                                 resutls.add(currentChar);
                                 change = false;
                                 if (maxMatching.length() < currentChar.length())
@@ -143,12 +156,14 @@ public class Search {
                 }
             }
         }
+        /*
         if (resutls.size() != 0) {
             System.out.println("results: " + resutls);
             System.out.println("maxMatching in this line (texte): " + maxMatching);
         }
-
-        return resutls;
+        System.out.println(">>> resutlsF : " + resutlsF);
+        */
+        return resutlsF;
     }
 
     public int[] retenue(String str) {
@@ -183,16 +198,24 @@ public class Search {
         return retenue;
     }
 
-    public int matchingWords(char[] facteur, int[] retenue, char[] texte) {
+    public ArrayList<ArrayList<Integer>> matchingWords(char[] facteur, int[] retenue, char[] line, int idLine) {
         int i = 0;
         int j = 0;
-
-        while (i < texte.length) {
-            if (j == facteur.length)
-                return (i - facteur.length);
+		 ArrayList<ArrayList<Integer>> result = new ArrayList<>();
 
 
-            if (texte[i] == facteur[j]) {
+        while (i < line.length) {
+            if (j == facteur.length) {
+            	
+            	ArrayList<Integer> elem = new ArrayList<>();
+            	elem.add(idLine);
+            	elem.add(i - facteur.length+1);
+            	
+            	result.add(elem); 
+            	j=0;
+            }
+
+            if (line[i] == facteur[j]) {
                 i++;
                 j++;
             } else {
@@ -206,12 +229,14 @@ public class Search {
 
         }
 
-        if (j == facteur.length)
-            return i - facteur.length;
-
-        else
-            return -1;
-
+        if (j == facteur.length) {
+            ArrayList<Integer> elem = new ArrayList<>();
+        	elem.add(idLine+1);
+        	elem.add(i - facteur.length+1);
+        	
+        	result.add(elem); 
+        }
+        return result;
     }
 
 
