@@ -34,6 +34,7 @@ public class RegEx {
 			// System.out.println(" >> Parsing regEx \"" + regEx + "\".");
 			// System.out.println(" >> ...");
 			regEx = "S.n";
+			regEx = "S(a|g|r)*on";
 			// regEx = "h(a|a)nd";
 			if (regEx.length() < 1) {
 				System.err.println("  >> ERROR: empty regEx.");
