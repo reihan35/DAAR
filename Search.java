@@ -7,7 +7,6 @@ public class Search {
 
 	// etape 5
 	public ArrayList<ArrayList<Integer>> searchWithDFA(DFA dfa, String txt, int idLine, int idCol) {
-		// System.out.println("........ text : " + txt);
 		int N = txt.length();
 		ArrayList<String> resutls = new ArrayList<>();
 		ArrayList<ArrayList<Integer>> resutlsF = new ArrayList<ArrayList<Integer>>();
@@ -20,6 +19,7 @@ public class Search {
 
 		boolean change = false;
 		// System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		// System.out.println("........ text : " + txt);
 		int idxCharFirstRep = -1;
 
 		for (ArrayList<Integer> state : dfa.q0) {
@@ -41,12 +41,13 @@ public class Search {
 
 					// System.out.println("$$ currentState: " + currentState);
 					if (currentState != null) {
+
 						// System.out.println(" 		dfa.Transitions.get(state)"  + dfa.Transitions.get(currentState).keySet());
-						// System.out.println("		i+1 : " + txt.charAt(i+1));
+
 						if(dfa.Transitions.get(currentState).keySet().contains(0xD07)){
 							// System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 							nextState = dfa.Transitions.get(currentState).get(0xD07);
-						}else {
+						}else if (i<N-1){
 							nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
 						}
 						// System.out.println("		 nextState: " + nextState);
@@ -196,10 +197,10 @@ public class Search {
 									maxMatching = currentChar;
 								currentChar = "";
 							}
-						} else
+						} else {
 							currentChar = "";
-
-						// System.out.println("sinon RIEN");
+							// System.out.println("sinon RIEN");
+						}
 					}
 					currentChar = "";
 					// System.out.println("je suis mammmmm: ");
@@ -210,8 +211,7 @@ public class Search {
 		 * if (resutls.size() != 0) { System.out.println("results: " + resutls);
 		 * System.out.println("maxMatching in this line (texte): " + maxMatching); }
 		 */
-		// System.out.println(">>> resutls : " + resutls);
-		System.out.println(">>> resutls : " + resutlsF);
+		// System.out.println(">>> resutls : " + resutlsF);
 		return resutlsF;
 	}
 

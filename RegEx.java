@@ -30,12 +30,12 @@ public class RegEx {
             regEx = arg[0];
             System.out.println("regEx : " + regEx);
             String fileName = arg[1];
-            fileName = "fileM1";
+            System.out.println(" >> file name : " + fileName);
             // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
             // System.out.println(" >> ...");
-            regEx = "S.n";
+            // regEx = "S.n";
             regEx = "S(a|g|r)*on";
-            // regEx = "h(a|a)nd";
+            // regEx = "S(a|b)";
             if (regEx.length() < 1) {
                 System.err.println("  >> ERROR: empty regEx.");
             } else {
@@ -44,9 +44,9 @@ public class RegEx {
                 try {
                     Search search = new Search();
                     ArrayList wordMatch = new ArrayList<>();
-                    String text = "hey I SaSargonwas Sargon1ing that";
                     ArrayList<String> lines = getLinesFiles(fileName);
-                    File file2 = new File(fileName);
+
+                    File file = new File(fileName);
 
                     if (isRegex(regEx)) {
                         RegExTree ret = parse();
@@ -64,36 +64,22 @@ public class RegEx {
                                 System.out.println(" regEx: " + regEx);
                                 // dans le cas où '\n' est dans l'expréssion régulière
                                 // text = search.readFileChar(fileName);
-
-                                System.out.println(" text: " + text);
-                                ArrayList<String> l = new ArrayList<>();
-                                l.add(text);
-                                mainM1(l, d);
+                                mainM1(lines, d);
                             } else {
                                 // la methode est plus rapide
                                 System.out.println("....ELSE.....");
-                                ArrayList<String> l = new ArrayList<>();
-
-                                String text1 = "truksdjfb lkfbez kfbSaSaSargon qkjfre";
-                                String text2 = "tsgegerrg regre goSarn SaSaSargonqkjfre";
-                                String text3 = "SaSaSaSargon qkjfre";
-
-                                // l.add(text1);
-                                // l.add(text2);
-                                l.add(text3);
-
                                 ArrayList<ArrayList<Integer>> result = mainM1(lines, d);
-                                printWordsInColorM1(FileToStrings(file2), result);
+                                printWordsInColorM1(lines, result);
                             }
                         }
                     } else {
                         // method 3
                         File cache = new File("cache_" + fileName);
-                        boolean truc = false;
-                        if (truc && Indexing.toHashInt(Indexing.FileToStrings(file2)).get(regEx) != null) {
+                        boolean truc = true;
+                        if (truc && Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
                             if (!cache.exists()) {
                                 try {
-                                    Indexing.makeCash(Indexing.FileToStrings(file2), fileName);
+                                    Indexing.makeCash(Indexing.FileToStrings(file), fileName);
                                 } catch (Exception e) {
                                     System.out.println("ERREUR" + e);
                                 }
@@ -101,11 +87,11 @@ public class RegEx {
 
                             Trie t = Indexing.trieFromFile(cache);
                             System.out.println(t.search(regEx));
-                            // printWordsInColor(regEx,FileToStrings(file2),t.search(regEx));
+                            printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
                         } else {
                             // KMP (method 2)
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                            // printWordsInColorKMP(regEx,FileToStrings(file2),result);
+                            printWordsInColorKMP(regEx,FileToStrings(file),result);
                         }
                     }
 
@@ -123,11 +109,11 @@ public class RegEx {
         int i = 0;
         for (String line : lines) {
             i++;
+            // System.err.println("line : " + line);
+
             ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
-            result.addAll(matching);
-			/*if(matching.size()>0) {
-				matching.forEach((k, v) -> result.computeIfAbsent(k, k2 -> new ArrayList<>()).addAll((v)));
-			}*/
+            if(matching.size()>0)
+                result.addAll(matching);
         }
         System.out.println("[M1] word match: " + result);
         return result;
@@ -208,7 +194,6 @@ public class RegEx {
     }
 
     public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
-        System.out.println("je vais print avec coleur !!! line : " + lines);
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
@@ -216,13 +201,13 @@ public class RegEx {
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-            /*System.out.println("ti.get(i).get(0) : " + ti.get(i).get(0));
-            System.out.println("line " + line);
-
+           /*System.out.println("line : " + line);
             System.out.println("1 mot : " + (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                    "2 mot : " + line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
-                    "3 mot : " + (line.length()>ti.get(i).get(2)? line.substring(ti.get(i).get(2), line.length()) : ""));
+                    "\n 2 mot : " + line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
+                    "\n 3 mot : " + (line.length()>ti.get(i).get(2)? line.substring(ti.get(i).get(2), line.length()) : ""));
             */
+
+
             System.out.println(
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                             ANSI_RED +
@@ -235,10 +220,16 @@ public class RegEx {
     public static ArrayList<String> getLinesFiles(String file) throws FileNotFoundException {
         ArrayList<String> lines = new ArrayList<String>();
         try {
+            int i = 0;
             Scanner scanner = new Scanner(new File(file));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                lines.add(line);
+
+                if(line.length() != 0) {
+                    lines.add(line);
+                    // System.out.println(i + ">>>>>>> : " + line);
+                }
+                i++;
             }
         } catch (Exception e) {
             e.printStackTrace();
