@@ -6,7 +6,7 @@ import java.io.*;
 public class Search {
 
 	// etape 5
-	public HashMap<String, ArrayList<ArrayList<Integer>>> searchWithDFA(DFA dfa, String txt, int idLine, int idCol) {
+	public ArrayList<ArrayList<Integer>> searchWithDFA(DFA dfa, String txt, int idLine, int idCol) {
 		// System.out.println("........ text : " + txt);
 		int N = txt.length();
 		ArrayList<String> resutls = new ArrayList<>();
@@ -20,19 +20,21 @@ public class Search {
 
 		boolean change = false;
 		System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		int idxCharFirstRep = -1;
 
 		for (ArrayList<Integer> state : dfa.q0) {
 			currentChar = "";
-			for (int i = 0; i < N; i++) {
 
-				System.out.println("..............................................................");
+			for (int i = 0; i < N; i++) {
+				System.out.println(i + "..............................................................");
 				if (dfa.Transitions.containsKey(state)) {
+					System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! dfa.Transitions.get(state)"  + dfa.Transitions.get(state));
+
 					currentState = dfa.Transitions.get(state).get((int) txt.charAt(i));
 					// System.out.println("$$ 1 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					System.out.println("$$ i : " + txt.charAt(i));
-					
-					// System.out.println("$$ currentState: " + currentState);
+					// System.out.println("$$ i : " + txt.charAt(i));
 
+					// System.out.println("$$ currentState: " + currentState);
 					if (currentState != null) {
 						// System.out.println(" i+1 : " + txt.charAt(i+1));
 						nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
@@ -49,7 +51,9 @@ public class Search {
 
 							ArrayList<Integer> elem = new ArrayList<>();
 							elem.add(idLine);
-							elem.add(i - currentChar.length() + 3);
+							//elem.add(i - currentChar.length() + 2); // deb
+							elem.add(i+1);
+							elem.add(i+currentChar.length()+1); // fin
 							resutlsF.add(elem);
 							resutls.add(currentChar);
 
@@ -62,15 +66,7 @@ public class Search {
 						} else if (nextState != null && dfa.Transitions.containsKey(currentState) && i < N - 1) {
 							System.out.println(" ---------------------------------------------------" + txt.charAt(i));
 
-							if(dfa.q.contains(currentState)) {
-								String text = txt;
-								System.out.println(">>>>>> : " + text.charAt(i) + "  |  i  : " + i + "  | size : " + text.length());
-								System.out.println(">>>>>   text : " + text);
-								System.out.println(">>>>> R text : " + text.substring(0,19));
-								System.out.println(text.substring(i, text.length()-1));
-								searchWithDFA(dfa, text, i, 0);
-								// System.out.println(">>>>>> : " + text.charAt(i));
-							}
+
 							// System.out.println(" ---------------------------------------------------");
 							if (!dfa.f.contains(currentState)) {
 
@@ -84,8 +80,23 @@ public class Search {
 								// System.out.println(" 0 nextState : " + nextState);
 								currentState = nextState;
 								i += 1;
+								int oldI =i;
 
 								while (nextState != null && i < N - 1) {
+
+									if(dfa.q.contains(currentState) && currentChar.length() > 2) {
+										System.out.println("		[DANS] currentChar : " + currentChar);
+
+										if(idxCharFirstRep == -1)
+											idxCharFirstRep = i;
+									}
+									System.out.println(">>>>>> : " + txt);
+									System.out.println(" 0 idxCharFirstRep >>>>>> : " + idxCharFirstRep);
+
+									// System.out.println("idxCharFirstRep >>>>>> : " + idxCharFirstRep);
+									// System.out.println(" * txt: " + txt.charAt(i));
+									// System.out.println(" * txt: (r) " + txt.charAt(i + 6));
+
 									change = true;
 									// System.out.println(" * current txt: " + txt.charAt(i));
 									// System.out.println(" * next txt: " + txt.charAt(i + 1));
@@ -116,6 +127,7 @@ public class Search {
 									}
 									i += 1;
 								}
+								i = oldI;
 								// System.out.println(" Apres le while " + i);
 								if (nextState != null && i == N - 1) {
 									currentState = nextState;
@@ -136,7 +148,9 @@ public class Search {
 										System.out.println("i : " + i);
 										ArrayList<Integer> elem = new ArrayList<>();
 										elem.add(idLine);
-										elem.add(i - currentChar.length() + 3);
+										elem.add(i+1);
+										elem.add(i+currentChar.length()+1);
+
 										resutlsF.add(elem);
 										resutls.add(currentChar);
 										matchingWordId.computeIfAbsent(currentChar, k -> new ArrayList<>()).add((elem));
@@ -158,7 +172,8 @@ public class Search {
 								// 1 : currentChar.length() = wordToSearch.length()-1
 								// pour currentChar.length()- 1
 								// 1 pour commencer de 1 et non de 0
-								elem.add(i - currentChar.length() + 3);
+								elem.add(i+1);
+								elem.add(i+currentChar.length()+1);
 								resutlsF.add(elem);
 								resutls.add(currentChar);
 								matchingWordId.computeIfAbsent(currentChar, k -> new ArrayList<>()).add((elem));
@@ -183,8 +198,8 @@ public class Search {
 		 * System.out.println("maxMatching in this line (texte): " + maxMatching); }
 		 */
 		// System.out.println(">>> resutls : " + resutls);
-		// System.out.println(">>> resutls : " + resutls);
-		return matchingWordId;
+		System.out.println(">>> resutls : " + resutlsF);
+		return resutlsF;
 	}
 
 	public int[] retenue(String str) {

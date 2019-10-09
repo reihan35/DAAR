@@ -30,6 +30,7 @@ public class RegEx {
 			regEx = arg[0];
 			System.out.println("regEx : " + regEx);
 			String fileName = arg[1];
+			fileName = "fileM1";
 			// System.out.println(" >> Parsing regEx \"" + regEx + "\".");
 			// System.out.println(" >> ...");
 			regEx = "SaSaSa(a|g|r)*on";
@@ -79,9 +80,10 @@ public class RegEx {
 								// l.add(text1);
 								// l.add(text2);
 								l.add(text3);
-								
-								HashMap<String, ArrayList<ArrayList<Integer>>> result = mainM1(l,d);
-							}
+
+                                ArrayList<ArrayList<Integer>> result = mainM1(lines,d);
+                                printWordsInColorM1(FileToStrings(file2),result);
+                            }
 						}
 					} else {
 						// method 3
@@ -103,7 +105,6 @@ public class RegEx {
 							// KMP (method 2)
 							ArrayList<ArrayList<Integer>> result = mainKMP(lines);
 							// printWordsInColorKMP(regEx,FileToStrings(file2),result);
-
 						}
 					}
 
@@ -114,17 +115,18 @@ public class RegEx {
 		}
 	}
 
-	public static HashMap<String, ArrayList<ArrayList<Integer>>> mainM1(ArrayList<String> lines, DFA d) {
-		HashMap<String, ArrayList<ArrayList<Integer>>> result = new HashMap<String, ArrayList<ArrayList<Integer>>>(); 
+	public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
+		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
 		Search search = new Search();
 		
 		int i =0;
 		for (String line : lines) {
 			i++;
-			HashMap<String, ArrayList<ArrayList<Integer>>> matching = search.searchWithDFA(d, line, i, 0);
-			if(matching.size()>0) {
+			ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
+			result.addAll(matching);
+			/*if(matching.size()>0) {
 				matching.forEach((k, v) -> result.computeIfAbsent(k, k2 -> new ArrayList<>()).addAll((v)));
-			}
+			}*/
 		}
 		System.out.println("[M1] word match: " + result);
 		return result;
@@ -185,21 +187,42 @@ public class RegEx {
 
 		}
 	}
+    public static void printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+        String ANSI_RESET = "\u001B[0m";
+        String ANSI_RED = "\u001B[42m";
+        for (int i = 0; i < ti.size(); i++) {
 
-	public static void printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+            // System.out.println(index);
+
+            String line = lines.get(ti.get(i).get(0) - 1);
+            System.out.println(
+                    line.substring(0, ti.get(i).get(1) - 1) +
+							ANSI_RED +
+							line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
+							ANSI_RESET +
+							line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()));
+
+        }
+    }
+
+	public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
 		String ANSI_RESET = "\u001B[0m";
 		String ANSI_RED = "\u001B[42m";
 		for (int i = 0; i < ti.size(); i++) {
-			
-			// System.out.println(index);
-			
-			String line = lines.get(ti.get(i).get(0) - 1);
-			System.out.println(
-					line.substring(0, 
-							ti.get(i).get(1) - 1) + ANSI_RED + line.substring(ti.get(i).get(1) - 1, 
-							ti.get(i).get(1) + reg.length() - 1)
-							+ ANSI_RESET + line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()));
 
+
+			String line = lines.get(ti.get(i).get(0) - 1);
+			System.out.println("ffffffffffffffff  " + line);
+			System.out.println(" 1 : line : " + line.substring(0, ti.get(i).get(1)-1));
+			System.out.println(" 2 : mot : " + line.substring(ti.get(i).get(1)-1, ti.get(i).get(2)));
+			System.out.println(" 3 : rest : " + line.substring(ti.get(i).get(2), line.length()));
+
+			System.out.println(
+						line.substring(0, ti.get(i).get(1)-1) +
+						ANSI_RED +
+						line.substring(ti.get(i).get(1)-1, ti.get(i).get(2))+
+						ANSI_RESET +
+						line.substring(ti.get(i).get(2), line.length()));
 		}
 	}
 	
