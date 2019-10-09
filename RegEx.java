@@ -18,6 +18,8 @@ public class RegEx {
 
     // REGEX
     private static String regEx;
+    private static String fileName;
+    private static String option = null;
 
     // CONSTRUCTOR
     public RegEx() {
@@ -27,20 +29,33 @@ public class RegEx {
         if (arg.length == 0) {
             return;
         } else {
-            regEx = arg[0];
-            System.out.println("regEx : " + regEx);
-            String fileName = arg[1];
-            System.out.println(" >> file name : " + fileName);
-            // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
-            // System.out.println(" >> ...");
-            // regEx = "S.n";
-            regEx = "S(a|g|r)*on";
-            // regEx = "S(a|b)";
+            if (arg.length == 2){
+                // daar PATTERN [FILE]
+                regEx = arg[0];
+                System.out.println("regEx : " + regEx);
+                fileName = arg[1];
+                System.out.println(" >> file name : " + fileName);
+                // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
+                // System.out.println(" >> ...");
+            }else if (arg.length == 3){
+                // daar [OPTIONS] PATTERN [FILE]
+                System.out.println("nb arg 3 ");
+                option = arg[0];
+                regEx = arg[1];
+                fileName = arg[2];
+                System.out.println("regEx : " + regEx);
+                System.out.println(" >> option : " + option);
+                System.out.println(" >> file name : " + fileName);
+                return;
+            }else{
+                return;
+            }
+
+
+
             if (regEx.length() < 1) {
                 System.err.println("  >> ERROR: empty regEx.");
             } else {
-                // for (int i = 1; i < regEx.length(); i++) System.out.print("," + (int)
-                // regEx.charAt(i));
                 try {
                     Search search = new Search();
                     ArrayList wordMatch = new ArrayList<>();
@@ -49,12 +64,10 @@ public class RegEx {
                     File file = new File(fileName);
 
                     if (isRegex(regEx)) {
+                        System.out.println("....Method1.....");
                         RegExTree ret = parse();
-                        // System.out.println(" >> Tree result: " + ret.toString() + ".");
-                        // System.out.println(" >> Here is the NFA of the tree : ");
                         NFA n = ret.toAutomaton();
                         n.print();
-                        // System.out.println(" >> Here is the DFA of the tree : ");
                         DFA d = n.to_DFA();
                         d.print();
 
@@ -64,7 +77,6 @@ public class RegEx {
                                 System.out.println(" regEx: " + regEx);
                                 // dans le cas où '\n' est dans l'expréssion régulière
                                 // text = search.readFileChar(fileName);
-                                mainM1(lines, d);
                             } else {
                                 // la methode est plus rapide
                                 System.out.println("....ELSE.....");
@@ -74,9 +86,10 @@ public class RegEx {
                         }
                     } else {
                         // method 3
+                        System.out.println("1 ....Method3.....");
                         File cache = new File("cache_" + fileName);
-                        boolean truc = true;
-                        if (truc && Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
+                        if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
+                            System.out.println(" 2 ....Method3.....");
                             if (!cache.exists()) {
                                 try {
                                     Indexing.makeCash(Indexing.FileToStrings(file), fileName);
@@ -87,11 +100,12 @@ public class RegEx {
 
                             Trie t = Indexing.trieFromFile(cache);
                             System.out.println(t.search(regEx));
-                            printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
+                            printWordsInColor(regEx,lines,t.search(regEx));
                         } else {
                             // KMP (method 2)
+                            System.out.println("....Method2.....");
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                            printWordsInColorKMP(regEx,FileToStrings(file),result);
+                            printWordsInColorKMP(regEx,lines,result);
                         }
                     }
 
