@@ -28,17 +28,21 @@ public class Search {
 			for (int i = 0; i < N; i++) {
 				System.out.println(i + "..............................................................");
 				if (dfa.Transitions.containsKey(state)) {
-					System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! dfa.Transitions.get(state)"  + dfa.Transitions.get(state));
+					System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! dfa.Transitions.get(state)"  + dfa.Transitions.get(state).keySet());
 
 					currentState = dfa.Transitions.get(state).get((int) txt.charAt(i));
 					// System.out.println("$$ 1 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					// System.out.println("$$ i : " + txt.charAt(i));
+					System.out.println("$$ i : " + txt.charAt(i));
 
-					// System.out.println("$$ currentState: " + currentState);
+					System.out.println("$$ currentState: " + currentState);
 					if (currentState != null) {
-						// System.out.println(" i+1 : " + txt.charAt(i+1));
+						System.out.println(" 		dfa.Transitions.get(state)"  + dfa.Transitions.get(currentState).keySet());
+						if(dfa.Transitions.get(currentState).keySet().contains('.'))
+							System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+						System.out.println("		i+1 : " + txt.charAt(i+1));
 						nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
-						// System.out.println(" nextState: " + nextState);
+						System.out.println("		 nextState: " + nextState);
 						currentChar = currentChar + txt.charAt(i);
 						// System.out.println(" currentChar: " + currentChar);
 
@@ -65,9 +69,6 @@ public class Search {
 							currentChar = "";
 						} else if (nextState != null && dfa.Transitions.containsKey(currentState) && i < N - 1) {
 							System.out.println(" ---------------------------------------------------" + txt.charAt(i));
-
-
-							// System.out.println(" ---------------------------------------------------");
 							if (!dfa.f.contains(currentState)) {
 
 								currentChar = currentChar + txt.charAt(i + 1);

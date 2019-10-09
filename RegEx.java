@@ -33,7 +33,7 @@ public class RegEx {
 			fileName = "fileM1";
 			// System.out.println(" >> Parsing regEx \"" + regEx + "\".");
 			// System.out.println(" >> ...");
-			regEx = "SaSaSa(a|g|r)*on";
+			regEx = "S.n";
 			// regEx = "h(a|a)nd";
 			if (regEx.length() < 1) {
 				System.err.println("  >> ERROR: empty regEx.");
