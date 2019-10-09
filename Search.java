@@ -19,16 +19,16 @@ public class Search {
 		HashMap<String, ArrayList<ArrayList<Integer>>> matchingWordId = new HashMap<String, ArrayList<ArrayList<Integer>>>();
 
 		boolean change = false;
-		System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		// System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		int idxCharFirstRep = -1;
 
 		for (ArrayList<Integer> state : dfa.q0) {
 			currentChar = "";
 
 			for (int i = 0; i < N; i++) {
-				System.out.println(i + "..............................................................");
+				// System.out.println(i + "..............................................................");
 				if (dfa.Transitions.containsKey(state)) {
-					System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! dfa.Transitions.get(state)"  + dfa.Transitions.get(state).keySet());
+					// System.out.println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! dfa.Transitions.get(state)"  + dfa.Transitions.get(state).keySet());
 
 					if(dfa.Transitions.get(state).keySet().contains(0xD07)){
 						currentState = dfa.Transitions.get(state).get(0xD07);
@@ -37,19 +37,19 @@ public class Search {
 					}
 
 					// System.out.println("$$ 1 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					System.out.println("$$ i : " + txt.charAt(i));
+					// System.out.println("$$ i : " + txt.charAt(i));
 
-					System.out.println("$$ currentState: " + currentState);
+					// System.out.println("$$ currentState: " + currentState);
 					if (currentState != null) {
-						System.out.println(" 		dfa.Transitions.get(state)"  + dfa.Transitions.get(currentState).keySet());
-						System.out.println("		i+1 : " + txt.charAt(i+1));
+						// System.out.println(" 		dfa.Transitions.get(state)"  + dfa.Transitions.get(currentState).keySet());
+						// System.out.println("		i+1 : " + txt.charAt(i+1));
 						if(dfa.Transitions.get(currentState).keySet().contains(0xD07)){
-							System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+							// System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 							nextState = dfa.Transitions.get(currentState).get(0xD07);
 						}else {
 							nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
 						}
-						System.out.println("		 nextState: " + nextState);
+						// System.out.println("		 nextState: " + nextState);
 						currentChar = currentChar + txt.charAt(i);
 						// System.out.println(" currentChar: " + currentChar);
 
@@ -75,7 +75,7 @@ public class Search {
 								maxMatching = currentChar;
 							currentChar = "";
 						} else if (nextState != null && dfa.Transitions.containsKey(currentState) && i < N - 1) {
-							System.out.println(" ---------------------------------------------------" + txt.charAt(i));
+							// System.out.println(" ---------------------------------------------------" + txt.charAt(i));
 							if (!dfa.f.contains(currentState)) {
 
 								currentChar = currentChar + txt.charAt(i + 1);
@@ -97,7 +97,7 @@ public class Search {
 
 								while (nextState != null && i < N - 1) {
 
-									System.out.println("text : " + txt);
+									// System.out.println("text : " + txt);
 									// System.out.println("idxCharFirstRep >>>>>> : " + idxCharFirstRep);
 									// System.out.println(" * txt: " + txt.charAt(i));
 									// System.out.println(" * txt: (r) " + txt.charAt(i + 6));
@@ -112,29 +112,29 @@ public class Search {
 									if (dfa.Transitions.get(currentState) != null) {
 										// System.out.println(" 1 je suis la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 										if(dfa.Transitions.get(currentState).keySet().contains(0xD07)){
-											System.out.println(" c'est un . 1 je suis la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+											// System.out.println(" c'est un . 1 je suis la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 											nextState = dfa.Transitions.get(currentState).get(0xD07);
 										}else{
 											nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
 										}
 
-										System.out.println(" 		New currentChar : " + currentState);
-										System.out.println(" 		NextStat : " + nextState);
+										// System.out.println(" 		New currentChar : " + currentState);
+										// System.out.println(" 		NextStat : " + nextState);
 									} else {
-										System.out.println("		nextState = null");
+										// System.out.println("		nextState = null");
 										nextState = null;
 									}
 									// System.out.println("3 je suis la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 									if (nextState != null) {
 										currentChar = currentChar + txt.charAt(i + 1);
-										System.out.println("			if (nextState != null)  ");
-										System.out.println("			1 next txt: " + txt.charAt(i + 1));
-										System.out.println(" 			1 currentChar: " + currentChar);
+										// System.out.println("			if (nextState != null)  ");
+										// System.out.println("			1 next txt: " + txt.charAt(i + 1));
+										// System.out.println(" 			1 currentChar: " + currentChar);
 										currentState = nextState;
-										System.out.println(" 			1 currentState: " + currentState);
+										// System.out.println(" 			1 currentState: " + currentState);
 									} else {
-										System.out.println(" je break !!!");
+										// System.out.println(" je break !!!");
 										break;
 									}
 									i += 1;
@@ -145,7 +145,7 @@ public class Search {
 									nextState = null;
 								}
 								i = oldI;
-								System.out.println(" Apres le while " + i);
+								// System.out.println(" Apres le while " + i);
 								// System.out.println(" >>>> nextState : " + nextState);
 
 								if (nextState == null && change) {
@@ -157,8 +157,8 @@ public class Search {
 									// System.out.println(" >>>> dfa.f. : " + dfa.f);
 									if (dfa.f.contains(currentState)) {
 										// System.out.println(" je suis accepté : " + currentChar);
-										System.out.println("txt.charAt(i); : " + txt.charAt(i));
-										System.out.println("i : " + i);
+										// System.out.println("txt.charAt(i); : " + txt.charAt(i));
+										// System.out.println("i : " + i);
 										ArrayList<Integer> elem = new ArrayList<>();
 										elem.add(idLine);
 										elem.add(i+1);
