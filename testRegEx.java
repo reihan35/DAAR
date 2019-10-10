@@ -5,7 +5,7 @@ import java.lang.Exception;
 import java.util.Random;
 import java.io.*;
 
-public class RegEx {
+public class testRegEx {
     // MACROS
     static final int CONCAT = 0xC04CA7;
     static final int ETOILE = 0xE7011E;
@@ -22,7 +22,7 @@ public class RegEx {
     private static String option = null;
 
     // CONSTRUCTOR
-    public RegEx() {
+    public testRegEx() {
     }
 
     public static void main(String arg[]) throws Exception {
@@ -85,34 +85,23 @@ public class RegEx {
                         }
                     } else {
                         // method 3
-                        Scanner myObj = new Scanner(System.in);
-                        System.out.println("Est-ce qu'il est important pour vous de voir aussi les mots où votre motif est suffixe ou milieu ?");
-                        System.out.println("Exemple : Le motif jour dans bonjour et bonnejournée");
-                        System.out.println("Tapez 1 pour oui 0 pour non.");
-                        int rep = myObj.nextInt();
-                        if (rep == 0){
-                            System.out.println("1 ....Method3.....");
-                            File cache = new File("cache_" + fileName);
-                            if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
-                                System.out.println(" 2 ....Method3.....");
-                                if (!cache.exists()) {
-                                    try {
-                                        Indexing.makeCash(Indexing.FileToStrings(file), fileName);
-                                    } catch (Exception e) {
-                                        System.out.println("ERREUR" + e);
-                                    }
+                        System.out.println("1 ....Method3.....");
+                        File cache = new File("cache_" + fileName);
+                        if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
+                            System.out.println(" 2 ....Method3.....");
+                            if (!cache.exists()) {
+                                try {
+                                    Indexing.makeCash(Indexing.FileToStrings(file), fileName);
+                                } catch (Exception e) {
+                                    System.out.println("ERREUR" + e);
                                 }
-
-                                Trie t = Indexing.trieFromFile(cache);
-                                System.out.println(t.search(regEx));
-                                printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
-                            } else {
-                                // KMP (method 2)
-                                System.out.println("....Method2.....");
-                                ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                                printWordsInColorKMP(regEx,lines,result);
                             }
+
+                            Trie t = Indexing.trieFromFile(cache);
+                            System.out.println(t.search(regEx));
+                            printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
                         } else {
+                            // KMP (method 2)
                             System.out.println("....Method2.....");
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines);
                             printWordsInColorKMP(regEx,lines,result);
