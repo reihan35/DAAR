@@ -86,23 +86,34 @@ public class RegEx {
                         }
                     } else {
                         // method 3
-                        System.out.println("1 ....Method3.....");
-                        File cache = new File("cache_" + fileName);
-                        if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
-                            System.out.println(" 2 ....Method3.....");
-                            if (!cache.exists()) {
-                                try {
-                                    Indexing.makeCash(Indexing.FileToStrings(file), fileName);
-                                } catch (Exception e) {
-                                    System.out.println("ERREUR" + e);
+                        Scanner myObj = new Scanner(System.in);
+                        System.out.println("Est-ce que il est important pour vous de voir aussi les mots où votre motif est infixe ou milieu ?");
+                        System.out.println("Exemple : jour dans bonjour et bonnejournée");
+                        System.out.println("Tapez 1 pour oui 0 pour non.");
+                        int rep = myObj.nextInt();
+                        if (rep == 0){
+                            System.out.println("1 ....Method3.....");
+                            File cache = new File("cache_" + fileName);
+                            if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
+                                System.out.println(" 2 ....Method3.....");
+                                if (!cache.exists()) {
+                                    try {
+                                        Indexing.makeCash(Indexing.FileToStrings(file), fileName);
+                                    } catch (Exception e) {
+                                        System.out.println("ERREUR" + e);
+                                    }
                                 }
-                            }
 
-                            Trie t = Indexing.trieFromFile(cache);
-                            System.out.println(t.search(regEx));
-                            printWordsInColor(regEx,lines,t.search(regEx));
+                                Trie t = Indexing.trieFromFile(cache);
+                                System.out.println(t.search(regEx));
+                                printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
+                            } else {
+                                // KMP (method 2)
+                                System.out.println("....Method2.....");
+                                ArrayList<ArrayList<Integer>> result = mainKMP(lines);
+                                printWordsInColorKMP(regEx,lines,result);
+                            }
                         } else {
-                            // KMP (method 2)
                             System.out.println("....Method2.....");
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines);
                             printWordsInColorKMP(regEx,lines,result);
@@ -172,7 +183,6 @@ public class RegEx {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
-            System.out.println("je rentre");
             Object lineNumt = ti.get(i).get(0);
             String s = (String) lineNumt;
             int lineNum = Integer.parseInt(s);
@@ -180,8 +190,8 @@ public class RegEx {
             String s2 = (String) indext;
             s2 = s2.substring(1, s2.length());
             int index = Integer.parseInt(s2);
-            // System.out.println(index);
-            String line = lines.get(lineNum - 1);
+            String line = lines.get(lineNum-1);
+            System.out.println(line);
             System.out.println(
                     line.substring(0, index - 1) + ANSI_RED + line.substring(index - 1, index + reg.length() - 1)
                             + ANSI_RESET + line.substring(index + reg.length() - 1, line.length()));
