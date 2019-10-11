@@ -256,6 +256,7 @@ public class Search {
 			if (j == facteur.length) {
 
 				ArrayList<Integer> elem = new ArrayList<>();
+
 				elem.add(idLine);
 				elem.add(i - facteur.length + 1);
 

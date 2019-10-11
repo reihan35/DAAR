@@ -32,39 +32,18 @@ public class RegEx {
         if (arg.length == 0) {
             return;
         } else {
-            // if (arg.length == 2){
-                // daar PATTERN [FILE]
-                regEx = arg[0];
-                fileName = arg[1];
-                System.out.println(" >> file name : " + fileName);
-                // regEx = "S(a|r|g)*on";
-                // regEx = "`eference.`";
-                // regEx = "`or*`";
-                System.out.println("regEx : " + regEx);
-                boolean allChar = false;
+            regEx = arg[0];
+            fileName = arg[1];
+            System.out.println(" >> file name : " + fileName);
+            System.out.println("regEx : " + regEx);
+            boolean allChar = false;
 
-                if(regEx.charAt(0) == '`' && regEx.charAt(regEx.length()-1) == '`') {
-                    System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length()-1));
-                    regEx = regEx.substring(1, regEx.length()-1);
-                    allChar = true;
-                }
-                System.out.println("1 regEx : " + regEx);
-
-                // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
-                // System.out.println(" >> ...");
-            /*}else if (arg.length == 3){
-                // daar [OPTIONS] PATTERN [FILE]
-                System.out.println("nb arg 3 ");
-                option = arg[0];
-                regEx = arg[1];
-                fileName = arg[2];
-                System.out.println("regEx : " + regEx);
-                System.out.println(" >> option : " + option);
-                System.out.println(" >> file name : " + fileName);
-                return;
-            }else{
-                return;
-            }*/
+            if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
+                System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
+                regEx = regEx.substring(1, regEx.length() - 1);
+                allChar = true;
+            }
+            System.out.println("1 regEx : " + regEx);
 
 
             if (regEx.length() < 1) {
@@ -77,7 +56,7 @@ public class RegEx {
 
                     File file = new File(fileName);
                     boolean non = false;
-                    if (isRegex(regEx) || !non) {
+                    if (isRegex(regEx)) {
                         System.out.println("....Method1.....");
                         RegExTree ret = parse(allChar);
                         NFA n = ret.toAutomaton();
@@ -85,11 +64,10 @@ public class RegEx {
                         DFA d = n.to_DFA();
                         // d.print();
                         System.out.println("................................");
-                        d.minDFA();
+                        // d.minDFA();
                         System.out.println("................................");
 
-                        boolean trucAsupp = true;
-                        if (isRegex(regEx) && trucAsupp) {
+                        if (isRegex(regEx)) {
                             if (regEx.contains("\n")) {
                                 System.out.println("....IF.....");
                                 System.out.println(" regEx: " + regEx);
@@ -102,14 +80,14 @@ public class RegEx {
                                 printWordsInColorM1(lines, result);
                             }
                         }
-                    } else if(non) {
+                    } else {
                         // method 3
                         Scanner myObj = new Scanner(System.in);
                         System.out.println("Est-ce qu'il est important pour vous de voir aussi les mots où votre motif est suffixe ou milieu ?");
                         System.out.println("Exemple : Le motif jour dans bonjour et bonnejournée");
                         System.out.println("Tapez 1 pour oui 0 pour non.");
                         int rep = myObj.nextInt();
-                        if (rep == 0){
+                        if (rep == 0) {
                             System.out.println("1 ....Method3.....");
                             File cache = new File("cache_" + fileName);
                             if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
@@ -124,17 +102,16 @@ public class RegEx {
 
                                 Trie t = Indexing.trieFromFile(cache);
                                 System.out.println(t.search(regEx));
-                                printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
+                                printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
                             } else {
                                 // KMP (method 2)
                                 System.out.println("....Method2.....");
                                 ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                                printWordsInColorKMP(regEx,lines,result);
+                                printWordsInColorKMP(regEx, lines, result);
                             }
                         } else {
-                            System.out.println("....Method2.....");
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                            printWordsInColorKMP(regEx,lines,result);
+                            printWordsInColorKMP(regEx, lines, result);
                         }
                     }
 
@@ -155,7 +132,7 @@ public class RegEx {
             // System.err.println("line : " + line);
 
             ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
-            if(matching.size()>0)
+            if (matching.size() > 0)
                 result.addAll(matching);
         }
         System.out.println("[M1] word match: " + result);
@@ -171,11 +148,10 @@ public class RegEx {
         for (String line : lines) {
             i++;
             ArrayList<ArrayList<Integer>> matching = search.matchingWords(regEx.toCharArray(), retenue,
-                    line.toCharArray(), i);
+                    line.toCharArray(), i-1);
             if (matching.size() > 0)
                 result.addAll(matching);
         }
-        // System.out.println("word match: " + result);
         return result;
     }
 
@@ -208,7 +184,7 @@ public class RegEx {
             String s2 = (String) indext;
             s2 = s2.substring(1, s2.length());
             int index = Integer.parseInt(s2);
-            String line = lines.get(lineNum-1);
+            String line = lines.get(lineNum - 1);
             System.out.println(line);
             System.out.println(
                     line.substring(0, index - 1) + ANSI_RED + line.substring(index - 1, index + reg.length() - 1)
@@ -225,12 +201,13 @@ public class RegEx {
             // System.out.println(index);
 
             String line = lines.get(ti.get(i).get(0) - 1);
-            System.out.println(
-                    line.substring(0, ti.get(i).get(1) - 1) +
+
+            System.out.println( ANSI_RESET +
+                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1): "") +
                             ANSI_RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
                             ANSI_RESET +
-                            line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()));
+                            ( ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()-1) : ""));
 
         }
     }
@@ -253,9 +230,9 @@ public class RegEx {
             System.out.println(
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                             ANSI_RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1)  +
+                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
                             ANSI_RESET +
-                            (line.length()>ti.get(i).get(2)? line.substring(ti.get(i).get(2), line.length()) : ""));
+                            (line.length() > ti.get(i).get(2) ? line.substring(ti.get(i).get(2), line.length()) : ""));
         }
     }
 
@@ -267,7 +244,7 @@ public class RegEx {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
 
-                if(line.length() != 0) {
+                if (line.length() != 0) {
                     lines.add(line);
                     // System.out.println(i + ">>>>>>> : " + line);
                 }
@@ -312,13 +289,13 @@ public class RegEx {
         for (int i = 0; i < regEx.length(); i++) {
             boolean ignore = false;
 
-            if(regEx.charAt(i) == '\\'){
+            if (regEx.charAt(i) == '\\') {
                 ignore = true;
 
-                i ++;
+                i++;
             }
 
-            if(allChar)
+            if (allChar)
                 result.add(new RegExTree(charToRoot(regEx.charAt(i), true), new ArrayList<RegExTree>()));
             else
                 result.add(new RegExTree(charToRoot(regEx.charAt(i), ignore), new ArrayList<RegExTree>()));
@@ -327,7 +304,7 @@ public class RegEx {
     }
 
     private static int charToRoot(char c, boolean ignore) {
-        if(ignore)
+        if (ignore)
             return (int) c;
         if (c == '.')
             return DOT;
