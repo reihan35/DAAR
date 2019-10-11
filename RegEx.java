@@ -5,6 +5,9 @@ import java.lang.Exception;
 import java.util.Random;
 import java.io.*;
 
+
+// java RegEx '`S(a|r|g)*on`' text1
+
 public class RegEx {
     // MACROS
     static final int CONCAT = 0xC04CA7;
@@ -29,15 +32,27 @@ public class RegEx {
         if (arg.length == 0) {
             return;
         } else {
-            if (arg.length == 2){
+            // if (arg.length == 2){
                 // daar PATTERN [FILE]
                 regEx = arg[0];
-                System.out.println("regEx : " + regEx);
                 fileName = arg[1];
                 System.out.println(" >> file name : " + fileName);
+                // regEx = "S(a|r|g)*on";
+                // regEx = "`eference.`";
+                // regEx = "`or*`";
+                System.out.println("regEx : " + regEx);
+                boolean allChar = false;
+
+                if(regEx.charAt(0) == '`' && regEx.charAt(regEx.length()-1) == '`') {
+                    System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length()-1));
+                    regEx = regEx.substring(1, regEx.length()-1);
+                    allChar = true;
+                }
+                System.out.println("1 regEx : " + regEx);
+
                 // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
                 // System.out.println(" >> ...");
-            }else if (arg.length == 3){
+            /*}else if (arg.length == 3){
                 // daar [OPTIONS] PATTERN [FILE]
                 System.out.println("nb arg 3 ");
                 option = arg[0];
@@ -49,7 +64,7 @@ public class RegEx {
                 return;
             }else{
                 return;
-            }
+            }*/
 
 
             if (regEx.length() < 1) {
@@ -61,16 +76,20 @@ public class RegEx {
                     ArrayList<String> lines = getLinesFiles(fileName);
 
                     File file = new File(fileName);
-
-                    if (isRegex(regEx)) {
+                    boolean non = false;
+                    if (isRegex(regEx) || !non) {
                         System.out.println("....Method1.....");
-                        RegExTree ret = parse();
+                        RegExTree ret = parse(allChar);
                         NFA n = ret.toAutomaton();
-                        n.print();
+                        // n.print();
                         DFA d = n.to_DFA();
-                        d.print();
+                        // d.print();
+                        System.out.println("................................");
+                        d.minDFA();
+                        System.out.println("................................");
 
-                        if (isRegex(regEx)) {
+                        boolean trucAsupp = true;
+                        if (isRegex(regEx) && trucAsupp) {
                             if (regEx.contains("\n")) {
                                 System.out.println("....IF.....");
                                 System.out.println(" regEx: " + regEx);
@@ -83,7 +102,7 @@ public class RegEx {
                                 printWordsInColorM1(lines, result);
                             }
                         }
-                    } else {
+                    } else if(non) {
                         // method 3
                         Scanner myObj = new Scanner(System.in);
                         System.out.println("Est-ce qu'il est important pour vous de voir aussi les mots où votre motif est suffixe ou milieu ?");
@@ -280,7 +299,7 @@ public class RegEx {
     }
 
     // FROM REGEX TO SYNTAX TREE
-    private static RegExTree parse() throws Exception {
+    private static RegExTree parse(boolean allChar) throws Exception {
         // BEGIN DEBUG: set conditionnal to true for debug example
         if (false)
             throw new Exception();
@@ -290,13 +309,26 @@ public class RegEx {
         // END DEBUG
 
         ArrayList<RegExTree> result = new ArrayList<RegExTree>();
-        for (int i = 0; i < regEx.length(); i++)
-            result.add(new RegExTree(charToRoot(regEx.charAt(i)), new ArrayList<RegExTree>()));
+        for (int i = 0; i < regEx.length(); i++) {
+            boolean ignore = false;
 
+            if(regEx.charAt(i) == '\\'){
+                ignore = true;
+
+                i ++;
+            }
+
+            if(allChar)
+                result.add(new RegExTree(charToRoot(regEx.charAt(i), true), new ArrayList<RegExTree>()));
+            else
+                result.add(new RegExTree(charToRoot(regEx.charAt(i), ignore), new ArrayList<RegExTree>()));
+        }
         return parse(result);
     }
 
-    private static int charToRoot(char c) {
+    private static int charToRoot(char c, boolean ignore) {
+        if(ignore)
+            return (int) c;
         if (c == '.')
             return DOT;
         if (c == '*')
@@ -891,6 +923,43 @@ class DFA {
     }
 
     // etape 4
+    /*public void minDFA() {
+
+        int nbStatesVisited = 1;
+        int nbStates = this.Transitions.size();
+        ArrayList<Integer> nextState = new ArrayList<Integer>();
+
+        ArrayList<Integer> stateInA = new ArrayList<Integer>();
+        ArrayList<Integer> stateInB = new ArrayList<Integer>();
+
+        ArrayList<Integer> stateOutA = new ArrayList<Integer>();
+        ArrayList<Integer> stateOutB = new ArrayList<Integer>();
+
+        int idTransiVersA = -1;
+        int idTransiVersB = -1;
+
+        // on commence par les états init
+        for (ArrayList<Integer> q0State : this.q0) {
+            // idTransiVersA = curTrans;
+            System.out.println("--------------------------------------------");
+            System.out.println("q0State  : " + q0State );
+
+            System.out.println("    truc : " + this.Transitions.get(q0State));
+            System.out.println("    truc 2 : " + this.Transitions.get(q0State).keySet());
+
+            // pour chaque etat avec la transition
+            for (Integer curIdTrans : this.Transitions.get(q0State).keySet()) {
+                System.out.println("    les transistion je me deplase de q0 : " + curIdTrans);
+                System.out.println("    truc 3 : " + this.Transitions.get(q0State).get(curIdTrans));
+
+                // pour chaque etats où je peut aller, je vérifie si je lui resemble
+                for (ArrayList<Integer> curState : this.Transitions.get(q0State).get(curIdTrans)) {
+                    System.out.println("    les etats où je peut aller a partir de q0 : " + curIdTrans);
+                }
+            }
+        }
+    }*/
+
     public void minDFA() {
         /**
          * pour chaque transition de A vers B avec x, on vérifie si A est un etat
