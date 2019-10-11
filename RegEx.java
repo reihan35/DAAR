@@ -24,6 +24,9 @@ public class RegEx {
     private static String fileName;
     private static String option = null;
 
+
+    static final String RED = "\033[0;31m"; // RED
+
     // CONSTRUCTOR
     public RegEx() {
     }
@@ -152,6 +155,8 @@ public class RegEx {
             if (matching.size() > 0)
                 result.addAll(matching);
         }
+        System.out.println(">>>>>>>>>> result: " + result.size());
+
         return result;
     }
 
@@ -186,9 +191,14 @@ public class RegEx {
             int index = Integer.parseInt(s2);
             String line = lines.get(lineNum - 1);
             System.out.println(line);
+
             System.out.println(
-                    line.substring(0, index - 1) + ANSI_RED + line.substring(index - 1, index + reg.length() - 1)
-                            + ANSI_RESET + line.substring(index + reg.length() - 1, line.length()));
+                    ANSI_RESET +
+                            line.substring(0, index - 1) +
+                            ANSI_RED +
+                            (index > 0 ?line.substring(index - 1, index + reg.length() - 1):"")
+                            + ANSI_RESET +
+                            ((index + reg.length()-1) > line.length() ?  line.substring(index + reg.length() - 1, line.length()) : ""));
 
         }
     }
@@ -204,7 +214,7 @@ public class RegEx {
 
             System.out.println( ANSI_RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1): "") +
-                            ANSI_RED +
+                            RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
                             ANSI_RESET +
                             ( ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()-1) : ""));
