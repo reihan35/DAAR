@@ -1,0 +1,12 @@
+* 1: -l: affiche le nom du fichier
+
+* -i : Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée (OK)
+
+* -w : Sélectionnez uniquement les lignes contenant des correspondances qui forment des mots entiers. (KO)
+
+* -x : Sélectionnez uniquement les correspondances qui correspondent exactement à la ligne entière. (KO)
+
+* -c : Supprimer la sortie normale; à la place, imprimez un nombre de lignes correspondantes pour chaque fichier d'entrée. (le nb de ligne où y a des match) (OK)
+
+* -m[n : nb ligne] : arrete l'affichage des linge matcher à la n-ème ligne 
+
