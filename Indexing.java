@@ -67,6 +67,20 @@ public class Indexing{
 
     }
 
+    public static void makeCash2(ArrayList<String> s, String filename) throws Exception{
+        HashMap<String,ArrayList<ArrayList<Integer>>> occurences = toHashMap2(s);
+        PrintWriter writer = new PrintWriter("cache_" + filename, "UTF-8");
+        
+        List ListofKeys = new ArrayList(sortByValue(toHashInt(s)).keySet());
+        for (int i=0; i<ListofKeys.size();i++){
+            writer.println((String)ListofKeys.get(i) +" "+ occurences.get((String) ListofKeys.get(i) ));
+        }
+
+        writer.close();
+
+    }
+
+
     public static HashMap<String, Integer> toHashInt (ArrayList<String> s){
     HashMap<String, Integer> hint= new HashMap<String, Integer>();
         Iterator it = toHashMap(s).entrySet().iterator();
@@ -76,6 +90,17 @@ public class Indexing{
             }
         return hint;
     }
+    
+    public static HashMap<String, Integer> toHashInt2 (ArrayList<String> s){
+    HashMap<String, Integer> hint= new HashMap<String, Integer>();
+        Iterator it = toHashMap2(s).entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                hint.put((String)pair.getKey(),((ArrayList<ArrayList<Integer>>)pair.getValue()).size());
+            }
+        return hint;
+    }
+
 
      public static HashMap<String, Integer> sortByValue(HashMap<String, Integer> hm) 
     { 
@@ -99,6 +124,81 @@ public class Indexing{
         } 
         return temp; 
     } 
+
+    public static HashMap<String,ArrayList<ArrayList<Integer>>> toHashMap2(ArrayList<String> lines){
+        
+        HashMap<String,ArrayList<ArrayList<Integer>>> occurences = new HashMap<String,ArrayList<ArrayList<Integer>>>();
+        
+        int index = 0;
+        int cpt = 1;
+        ArrayList<Character> separators = new ArrayList<Character>();
+        separators.add(' ');
+        separators.add(',');
+        separators.add('+');
+        separators.add('*');
+        separators.add('"');
+        separators.add('.');
+        separators.add(':');
+        separators.add(';');
+        separators.add('#');
+        separators.add('(');
+        separators.add(')');
+        separators.add('[');
+        separators.add(']');
+        separators.add('=');
+        separators.add('_');
+        separators.add('&');
+        separators.add('\'');
+        separators.add('-');
+
+        for(int j=0; j<lines.size(); j++){
+            String s = lines.get(j); 
+            cpt = 1;
+            for (int i=0; i<s.length();i++){
+                    char c = s.charAt(i);
+                    if(Character.isDigit(c)){
+                        break;
+                    }
+                    if (separators.contains(c) || i==s.length()-1){
+                        String mot = "";
+                        ArrayList<Integer> tuple = new ArrayList<Integer>();
+                        if (separators.contains(c)==false && i==s.length()-1){
+                            mot = s.substring(i-(cpt-1),i+1);
+                            tuple.add(j+1); //numero de ligne
+                            //System.out.println();
+                            tuple.add((i+1)-(cpt-1));
+                        }else{
+                            //System.out.println(i);
+                            mot = s.substring(i-(cpt-1),i);
+                            tuple.add(j+1); //numero de ligne
+                           // System.out.println();
+                            tuple.add(i-(cpt-2));
+
+                        }
+                    //System.out.println(mot);
+                    String mot2 = "";
+                    for (int l = 0;l<mot.length();l++){
+                        Character c2 = mot.charAt(l);
+                        mot2 = mot2 + c2;
+                    }
+                    ArrayList<ArrayList<Integer>> t = occurences.get(mot2);
+                    if (t == null){
+                         t = new ArrayList<ArrayList<Integer>>();
+                    }
+
+                    t.add(tuple);
+                    occurences.put(mot2,t);
+                    cpt = 1;
+                    //System.out.println(occurences);
+                }
+                else {
+                    //System.out.println(cpt);
+                    cpt++;
+                }
+            }
+        }
+        return occurences;
+    }
 
     public static HashMap<String,ArrayList<ArrayList<Integer>>> toHashMap(ArrayList<String> lines){
         
@@ -431,7 +531,41 @@ class Trie {
         }
     }
 
+    public ArrayList<ArrayList<Integer>> search2(String mot) {
+        HashMap<Character, TrieNode> children = root.getChildren();
+        //System.out.println(children);
+        ArrayList<Character> a = new ArrayList<Character>();
+        TrieNode node = null;
+       
+        for(int i = 0; i < mot.length(); i++) {
+            char c = mot.charAt(i);
+            if(children.containsKey(c)) {
+                node = children.get(c);
+                children = node.getChildren();
+            } else { 
+                node = null;
+                break;
+            }
+        }
+        if(node != null && node.getWordOccurences()!=null && node.getChildren().size()==0 ) {
+            return node.getWordOccurences();
+        } else {
+            if(node!=null && node.getChildren().size()>0){
+                ArrayList<ArrayList<Integer>> wo= new ArrayList<ArrayList<Integer>>();
+                if(node.getWordOccurences()!=null)
+                    wo.addAll(node.getWordOccurences());
+                for (Character c : node.getChildren().keySet()) {
+                    wo.addAll(search(mot + Character.toString(c)));
+                }
+                return wo;
+            }
+            return null;
+            }
+        }
+
     public ArrayList<ArrayList<Integer>> search(String word) {
+               // System.out.println("CAFEEEEEEE" );
+
         HashMap<Character, TrieNode> children = root.getChildren();
         //System.out.println(children);
         ArrayList<Character> a = new ArrayList<Character>();
@@ -441,6 +575,7 @@ class Trie {
             Character c = word.charAt(i);
             mot = mot + Character.toLowerCase(c);
         }
+        //System.out.println("CAFEEEEEEE" + mot);
         for(int i = 0; i < mot.length(); i++) {
             char c = mot.charAt(i);
             if(children.containsKey(c)) {

@@ -22,7 +22,7 @@ public class testeR {
 
     // REGEX
     private static String regEx;
-    private static String fileName;
+    private static String folderName;
     private static String option = null;
 
 
@@ -36,112 +36,74 @@ public class testeR {
         if (arg.length == 0) {
             return;
         } else {
-            regEx = arg[0];
-            fileName = arg[1];
-            //System.out.println(" >> file name : " + fileName);
-            //System.out.println("regEx : " + regEx);
-            boolean allChar = false;
-
-            if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
-                //System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
-                regEx = regEx.substring(1, regEx.length() - 1);
-                allChar = true;
-            }
-            //System.out.println("1 regEx : " + regEx);
 
 
-            if (regEx.length() < 1) {
-                System.err.println("  >> ERROR: empty regEx.");
-            } else {
-                try {
-                    Search search = new Search();
-                    ArrayList wordMatch = new ArrayList<>();
-                    ArrayList<String> lines = getLinesFiles(fileName);
+            folderName = arg[0];
+            final File folder = new File(folderName);
+            for (final File file : folder.listFiles()) {
+                System.out.println(file.getName());
+            
+                ArrayList<String> lines = getLinesFiles(folderName + file.getName());
+                HashMap<String, Integer> map = Indexing.toHashInt(Indexing.FileToStrings(file));
+                ArrayList<String> keysAsArray = new ArrayList<String>(map.keySet());
+                Random r = new Random();
+                String regEx = keysAsArray.get(r.nextInt(keysAsArray.size()));
+                System.out.println(regEx);
 
-                    File file = new File(fileName);
-                    boolean non = false;
-                    if (isRegex(regEx)) {
-                        System.out.println("....Method1.....");
-                        RegExTree ret = parse(allChar);
-                        NFA n = ret.toAutomaton();
-                        // n.print();
-                        DFA d = n.to_DFA();
-                        // d.print();
-                        System.out.println("................................");
-                        // d.minDFA();
-                        System.out.println("................................");
-
-                        if (isRegex(regEx)) {
-                            if (regEx.contains("\n")) {
-                                System.out.println("....IF.....");
-                                System.out.println(" regEx: " + regEx);
-                                // dans le cas où '\n' est dans l'expréssion régulière
-                                // text = search.readFileChar(fileName);
-                            } else {
-                                // la methode est plus rapide
-                                System.out.println("....ELSE.....");
-                                ArrayList<ArrayList<Integer>> result = mainM1(lines, d);
-                                printWordsInColorM1(lines, result);
-                            }
+                //egrep 
+                System.out.println("egrep");
+                //System.out.println("path :" + folderName + file.getName());
+                String c = "egrep " + regEx +" "+ folderName + file.getName();
+                Instant start = Instant.now();
+                final Process process = Runtime.getRuntime().exec(c);
+                Instant finish = Instant.now();
+                long timeElapsed = Duration.between(start, finish).toMillis(); 
+                System.out.println(timeElapsed);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line = "";
+                    try {
+                        while((line = reader.readLine()) != null) {
+                            //System.out.println(line);
                         }
-                    } else {
-                        //egrep 
-                        System.out.println("egrep");
-                        String c = "egrep help text1";
-                        Instant start = Instant.now();
-                        final Process process = Runtime.getRuntime().exec(c);
-                        Instant finish = Instant.now();
-                        long timeElapsed = Duration.between(start, finish).toMillis(); 
-                        System.out.println(timeElapsed);
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                            String line = "";
-                            try {
-                                while((line = reader.readLine()) != null) {
-                                    System.out.println(line);
-                                }
-                            } finally {
-                                reader.close();
-                            }
-                        // method 3
-                        HashMap<String, Integer> map = Indexing.toHashInt(Indexing.FileToStrings(file));
-                        ArrayList<String> keysAsArray = new ArrayList<String>(map.keySet());
-                        Random r = new Random();
-                        String regEx = keysAsArray.get(r.nextInt(keysAsArray.size()));
-                        System.out.println("1 ....Method3.....");
-                        start = Instant.now();
-                        File cache = new File("cache_" + fileName);
-                        System.out.println(" 2 ....Method3.....");
-                        if (!cache.exists()) {
-                            try {
-                                Indexing.makeCash(Indexing.FileToStrings(file), fileName);
-                            } catch (Exception e) {
-                                System.out.println("ERREUR" + e);
-                            }
-                        }
-
-                        Trie t = Indexing.trieFromFile(cache);
-                        t.search(regEx);
-                        finish = Instant.now();
-                        timeElapsed = Duration.between(start, finish).toMillis(); 
-                        System.out.println(timeElapsed);
-                        printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
-                                // KMP (method 2)
-                        System.out.println("....Method2.....");
-                        start = Instant.now();
-                        ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                        finish = Instant.now();
-                        timeElapsed = Duration.between(start, finish).toMillis(); 
-                        System.out.println(timeElapsed);
-                        printWordsInColorKMP(regEx, lines, result);
-                
+                    } finally {
+                        reader.close();
                     }
-
-                } catch (Exception e) {
-                    System.err.println("  >> ERROR: syntax error for regEx \"" + regEx + "\". " + e);
+                // method 3
+                
+                System.out.println("1 ....Method3.....");
+                start = Instant.now();
+                File cache = new File("cache_" + file.getName());
+                //System.out.println(" 2 ....Method3.....");
+                if (!cache.exists()) {
+                    try {
+                        Indexing.makeCash(Indexing.FileToStrings(file), file.getName());
+                    } catch (Exception e) {
+                       // System.out.println("ERREUR" + e);
+                    }
                 }
+
+                Trie t = Indexing.trieFromFile(cache);
+                t.search(regEx);
+                finish = Instant.now();
+                timeElapsed = Duration.between(start, finish).toMillis(); 
+                System.out.println(timeElapsed);
+                //printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
+                
+                // KMP (method 2)
+                System.out.println("....Method2.....");
+                start = Instant.now();
+                ArrayList<ArrayList<Integer>> result = mainKMP(lines,regEx);
+                finish = Instant.now();
+                timeElapsed = Duration.between(start, finish).toMillis(); 
+                System.out.println(timeElapsed);
+                
+                //printWordsInColorKMP(regEx, lines, result);
             }
+            
         }
-    }
+    } 
+
+
 
     public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
@@ -160,11 +122,10 @@ public class testeR {
         return result;
     }
 
-    public static ArrayList<ArrayList<Integer>> mainKMP(ArrayList<String> lines) {
+    public static ArrayList<ArrayList<Integer>> mainKMP(ArrayList<String> lines, String regEx) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
         Search search = new Search();
         int[] retenue = search.retenue(regEx);
-
         int i = 0;
         for (String line : lines) {
             i++;
