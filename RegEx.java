@@ -33,24 +33,30 @@ public class RegEx {
     }
 
     public static void main(String arg[]) throws Exception {
+
         String c = "egrep help text1";
         Instant start = Instant.now();
         final Process process = Runtime.getRuntime().exec(c);
         Instant finish = Instant.now();
-        long timeElapsed = Duration.between(start, finish).toMillis(); 
+        long timeElapsed = Duration.between(start, finish).toMillis();
         System.out.println(timeElapsed);
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = "";
-            try {
-                while((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
-            } finally {
-                reader.close();
+        String line = "";
+
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
+        } finally {
+            reader.close();
+        }
         if (arg.length == 0) {
             return;
         } else {
+            boolean BEG = false;
+            boolean END = false;
+
             regEx = arg[0];
             fileName = arg[1];
             System.out.println(" >> file name : " + fileName);
@@ -71,10 +77,17 @@ public class RegEx {
                 try {
                     Search search = new Search();
                     ArrayList wordMatch = new ArrayList<>();
-                    ArrayList<String> lines = getLinesFiles(fileName);
+                    String[] regExs = regEx.split("\\n");
+
+                    if (regEx.substring(0, 1).contains("^"))
+                        BEG = true;
+
+                    if (regEx.substring(regEx.length() - 1, regEx.length()).contains("$"))
+                        END = true;
+
+                    ArrayList<String> lines = getLinesFiles(fileName, BEG, END);
 
                     File file = new File(fileName);
-                    boolean non = false;
                     if (isRegex(regEx)) {
                         System.out.println("....Method1.....");
                         RegExTree ret = parse(allChar);
@@ -87,17 +100,10 @@ public class RegEx {
                         System.out.println("................................");
 
                         if (isRegex(regEx)) {
-                            if (regEx.contains("\n")) {
-                                System.out.println("....IF.....");
-                                System.out.println(" regEx: " + regEx);
-                                // dans le cas où '\n' est dans l'expréssion régulière
-                                // text = search.readFileChar(fileName);
-                            } else {
-                                // la methode est plus rapide
-                                System.out.println("....ELSE.....");
-                                ArrayList<ArrayList<Integer>> result = mainM1(lines, d);
-                                printWordsInColorM1(lines, result);
-                            }
+                            // la methode est plus rapide
+                            System.out.println("....ELSE.....");
+                            ArrayList<ArrayList<Integer>> result = mainM1(lines, d);
+                            printWordsInColorM1(lines, result, BEG, END);
                         }
                     } else {
                         // method 3
@@ -167,7 +173,7 @@ public class RegEx {
         for (String line : lines) {
             i++;
             ArrayList<ArrayList<Integer>> matching = search.matchingWords(regEx.toCharArray(), retenue,
-                    line.toCharArray(), i-1);
+                    line.toCharArray(), i - 1);
             if (matching.size() > 0)
                 result.addAll(matching);
         }
@@ -212,9 +218,9 @@ public class RegEx {
                     ANSI_RESET +
                             line.substring(0, index - 1) +
                             ANSI_RED +
-                            (index > 0 ?line.substring(index - 1, index + reg.length() - 1):"")
+                            (index > 0 ? line.substring(index - 1, index + reg.length() - 1) : "")
                             + ANSI_RESET +
-                            ((index + reg.length()-1) > line.length() ?  line.substring(index + reg.length() - 1, line.length()) : ""));
+                            ((index + reg.length() - 1) > line.length() ? line.substring(index + reg.length() - 1, line.length()) : ""));
 
         }
     }
@@ -228,17 +234,17 @@ public class RegEx {
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-            System.out.println( ANSI_RESET +
-                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1): "") +
-                            RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
-                            ANSI_RESET +
-                            ( ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()-1) : ""));
+            System.out.println(ANSI_RESET +
+                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
+                    RED +
+                    line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
+                    ANSI_RESET +
+                    (ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length() - 1) : ""));
 
         }
     }
 
-    public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+    public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti, boolean BEG, boolean END) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
@@ -246,23 +252,24 @@ public class RegEx {
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-           /*System.out.println("line : " + line);
-            System.out.println("1 mot : " + (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                    "\n 2 mot : " + line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
-                    "\n 3 mot : " + (line.length()>ti.get(i).get(2)? line.substring(ti.get(i).get(2), line.length()) : ""));
-            */
+            if (BEG)
+                line = line.replace("^", "");
 
+            if (END)
+                line = line.replace("$", "");
 
             System.out.println(
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                            ANSI_RED +
+                            RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
                             ANSI_RESET +
                             (line.length() > ti.get(i).get(2) ? line.substring(ti.get(i).get(2), line.length()) : ""));
         }
     }
 
-    public static ArrayList<String> getLinesFiles(String file) throws FileNotFoundException {
+    public static ArrayList<String> getLinesFiles(String file, boolean BEG, boolean END) throws FileNotFoundException {
+        System.out.println(" BEG LINES : " + BEG);
+        System.out.println(" END LINES : " + END);
         ArrayList<String> lines = new ArrayList<String>();
         try {
             int i = 0;
@@ -271,6 +278,11 @@ public class RegEx {
                 String line = scanner.nextLine();
 
                 if (line.length() != 0) {
+                    if (BEG)
+                        line = "^" + line;
+                    if (END)
+                        line = line + "$";
+
                     lines.add(line);
                     // System.out.println(i + ">>>>>>> : " + line);
                 }
@@ -298,7 +310,7 @@ public class RegEx {
 
     private static boolean isRegex(String str) {
         return ((!str.equals("")) && (str != null) && (str.contains(".") || str.contains("*") || str.contains("|")
-                || str.contains("(") || str.contains(")")));
+                || str.contains("(") || str.contains(")") || str.contains("^") || str.contains("$") || str.contains("\\n")));
     }
 
     // FROM REGEX TO SYNTAX TREE
@@ -316,8 +328,8 @@ public class RegEx {
             boolean ignore = false;
 
             if (regEx.charAt(i) == '\\') {
+                System.out.println(">>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! .......................");
                 ignore = true;
-
                 i++;
             }
 
