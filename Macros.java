@@ -1,0 +1,11 @@
+public final class Macros {
+
+    static final String RED = "\033[0;31m"; // RED
+    public static final String GREEN = "\033[0;32m";   // GREEN
+    public static final String BLUE_BOLD = "\033[1;34m";   // BLUE
+    public static final String RESET = "\033[0m";  // Text Reset
+    public static final String PURPLE_BOLD = "\033[1;35m"; // PURPLE
+
+
+
+}

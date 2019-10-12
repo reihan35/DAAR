@@ -4,10 +4,9 @@ import java.lang.Exception;
 import java.io.*;
 
 public class Search {
-    static final String RED = "\033[0;31m"; // RED
 
     // etape 5
-    public ArrayList<ArrayList<Integer>> searchWithDFA(DFA dfa, String txt, int idLine, boolean printMatch) {
+    public ArrayList<ArrayList<Integer>> searchWithDFA(DFA dfa, String txt, int idLine, boolean printMatchs) {
         int N = txt.length();
         ArrayList<String> resutls = new ArrayList<>();
         ArrayList<ArrayList<Integer>> resutlsF = new ArrayList<ArrayList<Integer>>();
@@ -213,62 +212,51 @@ public class Search {
          * System.out.println("maxMatching in this line (texte): " + maxMatching); }
          */
         // System.out.println(">>> resutls : " + resutlsF);
+        if (printMatchs)
+            printWordsMatching(resutls);
         return resutlsF;
     }
 
     public static void printWordsMatching(ArrayList<String> resutls) {
 
-        for (String word : resutl) {
-            System.out.println(RED + word);
+        for (String word : resutls) {
+            System.out.println(Macros.RED + word);
 
         }
     }
-
 
     public int[] retenue(String str) {
         int[] retenue = new int[str.length()];
         char[] facteur = str.toCharArray();
 
-        int currentIdx = 0;
-        int value = 0;
-        int j = 1;
+        retenue[0] = 0;
+        retenue[1] = 0;
 
-        for (int i = 0; i < facteur.length; i++) {
-            value = 0;
-            if (facteur[i] == facteur[0]) {
-                retenue[currentIdx] = -1;
-                currentIdx += 1;
-            } else if (currentIdx == 1) {
-                currentIdx++;
-                retenue[currentIdx] = 0;
-            } else {
-                j = 1;
-                while (j <= currentIdx - j + 1) {
-                    if (str.substring(0, j).equals(str.substring(currentIdx - j, currentIdx))) {
-                        value = j;
-                    }
-                    j++;
-                }
+        for (int i = 2; i < facteur.length; i++)
+            retenue[i] = (facteur[retenue[i - 1]] == facteur[i - 1]) ? retenue[i - 1] + 1 : 0;
 
-                retenue[currentIdx] = value;
-                currentIdx += 1;
-            }
-        }
+        for (int i = 0; i < retenue.length; i++)
+            retenue[i] = (facteur[i] == facteur[0] && retenue[i] == 0) ? -1 : retenue[i];
+
+        /*for(int a : retenue)
+            System.out.print(a + ",");
+        System.out.println();*/
+
         return retenue;
+
     }
 
-    public ArrayList<ArrayList<Integer>> matchingWords(char[] facteur, int[] retenue, char[] line, int idLine) {
+    public ArrayList<ArrayList<Integer>> matchingWords(char[] facteur, int[] retenue, char[] line, int idline) {
         int i = 0;
         int j = 0;
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
 
         while (i < line.length) {
+
             if (j == facteur.length) {
-
-                ArrayList<Integer> elem = new ArrayList<>();
-                elem.add(idLine);
+                ArrayList<Integer> elem = new ArrayList<Integer>();
+                elem.add(idline + 1);
                 elem.add(i - facteur.length + 1);
-
                 result.add(elem);
                 j = 0;
             }
@@ -288,14 +276,14 @@ public class Search {
         }
 
         if (j == facteur.length) {
-            ArrayList<Integer> elem = new ArrayList<>();
-            elem.add(idLine + 1);
+            ArrayList<Integer> elem = new ArrayList<Integer>();
+            elem.add(idline + 1);
             elem.add(i - facteur.length + 1);
-
             result.add(elem);
         }
         return result;
     }
+
 
     public static String readFileChar(String file) throws FileNotFoundException {
         String result = "";

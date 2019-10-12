@@ -5,38 +5,32 @@ import java.lang.Exception;
 import java.util.Random;
 import java.io.*;
 
-
 // java RegEx '`S(a|r|g)*on`' text1
 
 public class RegEx {
+
     // MACROS
-    static final int CONCAT = 0xC04CA7;
-    static final int ETOILE = 0xE7011E;
-    static final int ALTERN = 0xA17E54;
-    static final int PROTECTION = 0xBADDAD;
+    public static final int CONCAT = 0xC04CA7;
+    public static final int ETOILE = 0xE7011E;
+    public static final int ALTERN = 0xA17E54;
+    public static final int PROTECTION = 0xBADDAD;
 
-    static final int PARENTHESEOUVRANT = 0x16641664;
-    static final int PARENTHESEFERMANT = 0x51515151;
-    static final int DOT = 0xD07;
-
-    static final String RED = "\033[0;31m"; // RED
-    public static final String GREEN = "\033[0;32m";   // GREEN
-    public static final String BLUE_BOLD = "\033[1;34m";   // BLUE
-    public static final String RESET = "\033[0m";  // Text Reset
-    public static final String PURPLE_BOLD = "\033[1;35m"; // PURPLE
+    public static final int PARENTHESEOUVRANT = 0x16641664;
+    public static final int PARENTHESEFERMANT = 0x51515151;
+    public static final int DOT = 0xD07;
 
 
     // REGEX
-    private static String regEx;
-    private static String fileName;
-    private static String option = null;
-    private static boolean i = false;
-    private static boolean w = false;
-    private static boolean x = false;
-    private static boolean c = false;
-    private static boolean m = false;
-    private static int mNB = 0;
-    private static boolean o = false;
+    public static String regEx;
+    public static String fileName;
+    public static String option = null;
+    public static boolean i = false;
+    public static boolean w = false;
+    public static boolean x = false;
+    public static boolean c = false;
+    public static boolean m = false;
+    public static int mNB = 0;
+    public static boolean o = false;
 
     // CONSTRUCTOR
     public RegEx() {
@@ -50,13 +44,9 @@ public class RegEx {
             return;
         } else {
             if (arg.length == 2) {
-                // daar PATTERN [FILE]
                 regEx = arg[0];
                 fileName = arg[1];
                 System.out.println(" >> file name : " + fileName);
-                // regEx = "S(a|r|g)*on";
-                // regEx = "`eference.`";
-                // regEx = "`or*`";
                 System.out.println("regEx : " + regEx);
 
                 if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
@@ -65,9 +55,6 @@ public class RegEx {
                     allChar = true;
                 }
                 System.out.println("1 regEx : " + regEx);
-
-                // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
-                // System.out.println(" >> ...");
 
             } else if (arg.length == 3) {
                 // daar [OPTIONS] PATTERN [FILE]
@@ -81,7 +68,7 @@ public class RegEx {
 
                 // ok 1.option l :
                 if (option.contains("l")) {
-                    System.out.println("File name : " + PURPLE_BOLD + fileName);
+                    System.out.println("File name : " + Macros.PURPLE_BOLD + fileName);
                     return;
                 }
 
@@ -121,7 +108,7 @@ public class RegEx {
 
                     File file = new File(fileName);
                     boolean non = false;
-                    if (isRegex(regEx) || !non) {
+                    if (isRegex(regEx)) {
                         System.out.println("....Method1.....");
                         RegExTree ret = parse(allChar);
                         NFA n = ret.toAutomaton();
@@ -129,11 +116,10 @@ public class RegEx {
                         DFA d = n.to_DFA();
                         // d.print();
                         System.out.println("................................");
-                        d.minDFA();
+                        // d.minDFA();
                         System.out.println("................................");
 
-                        boolean trucAsupp = true;
-                        if (isRegex(regEx) && trucAsupp) {
+                        if (isRegex(regEx)) {
                             if (regEx.contains("\n")) {
                                 System.out.println("....IF.....");
                                 // System.out.println(" regEx: " + regEx);
@@ -144,23 +130,24 @@ public class RegEx {
                                 System.out.println("....ELSE.....");
                                 ArrayList<ArrayList<Integer>> result = mainM1(lines, d, c, o);
                                 if (c) {
-                                    System.out.println("number matching lines : " + RED + result.size());
+                                    System.out.println("number matching lines : " + Macros.RED + result.size());
                                     return;
                                 }
 
                                 if (true) {
-                                    printWordsInColorM1WithIdLine(lines, result, o);
-                                }else
+                                    printWordsInColorM1WithIdLine(lines, result);
+                                } else
                                     printWordsInColorM1(lines, result);
 
                             }
                         }
-                    } else if (non) {
+                    } else {
                         // method 3
                         Scanner myObj = new Scanner(System.in);
                         System.out.println("Est-ce qu'il est important pour vous de voir aussi les mots où votre motif est suffixe ou milieu ?");
                         System.out.println("Exemple : Le motif jour dans bonjour et bonnejournée");
                         System.out.println("Tapez 1 pour oui 0 pour non.");
+
                         int rep = myObj.nextInt();
                         if (rep == 0) {
                             System.out.println("1 ....Method3.....");
@@ -178,13 +165,20 @@ public class RegEx {
                                 Trie t = Indexing.trieFromFile(cache);
                                 System.out.println(t.search(regEx));
                                 printWordsInColor(regEx, lines, t.search(regEx));
+                                // printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
                             } else {
                                 System.out.println("....Method2.....");
                                 ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
-                                if (c)
-                                    return;
-                                // printWordsInColorKMP(regEx, lines, result);
+                                //if (c)
+                                //  return;
+                                printWordsInColorKMP(regEx, lines, result);
                             }
+                        } else {
+                            System.out.println("....Method2.....");
+                            ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
+                            if (c)
+                              return;
+                            printWordsInColorKMP(regEx, lines, result);
                         }
                     }
 
@@ -223,7 +217,7 @@ public class RegEx {
         for (String line : lines) {
             i++;
             ArrayList<ArrayList<Integer>> matching = search.matchingWords(regEx.toCharArray(), retenue,
-                    line.toCharArray(), i);
+                    line.toCharArray(), i - 1);
             if (matching.size() > 0) {
                 result.addAll(matching);
                 nbLineMatch++;
@@ -264,9 +258,14 @@ public class RegEx {
             int index = Integer.parseInt(s2);
             String line = lines.get(lineNum - 1);
             System.out.println(line);
+
             System.out.println(
-                    line.substring(0, index - 1) + ANSI_RED + line.substring(index - 1, index + reg.length() - 1)
-                            + ANSI_RESET + line.substring(index + reg.length() - 1, line.length()));
+                    ANSI_RESET +
+                            line.substring(0, index - 1) +
+                            ANSI_RED +
+                            (index > 0 ? line.substring(index - 1, index + reg.length() - 1) : "")
+                            + ANSI_RESET +
+                            ((index + reg.length() - 1) > line.length() ? line.substring(index + reg.length() - 1, line.length()) : ""));
 
         }
     }
@@ -277,12 +276,14 @@ public class RegEx {
         for (int i = 0; i < ti.size(); i++) {
 
             String line = lines.get(ti.get(i).get(0) - 1);
-            System.out.println(
-                    line.substring(0, ti.get(i).get(1) - 1) +
-                            ANSI_RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
-                            ANSI_RESET +
-                            line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()));
+
+            System.out.println(ANSI_RESET +
+                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
+                    Macros.RED +
+                    line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
+                    ANSI_RESET +
+                    (ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length() - 1) : ""));
+
         }
     }
 
@@ -294,7 +295,7 @@ public class RegEx {
             if (i == mNB)
                 break;
             String line = lines.get(ti.get(i).get(0) - 1);
-            System.out.println(BLUE_BOLD + ti.get(i).get(0) + GREEN + ": " + RESET +
+            System.out.println(Macros.BLUE_BOLD + ti.get(i).get(0) + Macros.GREEN + ": " + Macros.RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                     ANSI_RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
@@ -351,7 +352,7 @@ public class RegEx {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 // System.out.println("line: " + line);
-                search.searchWithDFA(d, line, 0, 0);
+                search.searchWithDFA(d, line, 0, false);
             }
         } catch (Exception e) {
             e.printStackTrace();
