@@ -34,6 +34,11 @@ public class testeR {
 
     public static void main(String arg[]) throws Exception {
         if (arg.length == 0) {
+            try{
+                generateFile(100,"fichier1");
+            }catch(Exception e){
+                System.out.println(e);
+            }
             return;
         } else {
 
@@ -98,12 +103,63 @@ public class testeR {
                 System.out.println(timeElapsed);
                 
                 //printWordsInColorKMP(regEx, lines, result);
+                
             }
             
         }
     } 
-
-
+    public static void generateFile(int taille,String fileName) throws Exception{
+        ArrayList<Character> alphabet = new ArrayList<Character>();
+        alphabet.add('a');
+        alphabet.add('b');
+        alphabet.add('c');
+        alphabet.add('d');
+        alphabet.add('e');
+        alphabet.add('f');
+        alphabet.add('g');
+        alphabet.add('h');
+        alphabet.add('i');
+        alphabet.add('j');
+        alphabet.add('k');
+        alphabet.add('l');
+        alphabet.add('m');
+        alphabet.add('n');
+        alphabet.add('o');
+        alphabet.add('p');
+        alphabet.add('q');
+        alphabet.add('r');
+        alphabet.add('s');
+        alphabet.add('t');
+        alphabet.add('u');
+        alphabet.add('v');
+        alphabet.add('w');
+        alphabet.add('x');
+        alphabet.add('y');
+        alphabet.add('z');
+        int cpt = 0;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        System.out.println(writer);
+        while(cpt < taille){
+            Random r = new Random();
+            int low = 3;
+            int high = 10;
+            int result = r.nextInt(high-low) + low;
+            String s = "";
+            int low2 = 0;
+            int high2 = 25;
+            for(int i = 0 ; i<result ; i++){
+                int r2 = r.nextInt(25);
+                s = s + alphabet.get(r2);
+            }
+            System.out.println(s);
+            writer.write(s + " ");
+            cpt++;
+            if(cpt%18==0){
+                writer.write("\n");  
+            }
+        }
+        writer.close();
+    }
 
     public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
