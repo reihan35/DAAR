@@ -1,11 +1,15 @@
+import java.util.concurrent.TimeUnit;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Exception;
 import java.util.Random;
 import java.io.*;
+import java.time.*;
 
-public class testRegEx {
+// java RegEx '`S(a|r|g)*on`' text1
+
+public class testeR {
     // MACROS
     static final int CONCAT = 0xC04CA7;
     static final int ETOILE = 0xE7011E;
@@ -21,35 +25,29 @@ public class testRegEx {
     private static String fileName;
     private static String option = null;
 
+
+    static final String RED = "\033[0;31m"; // RED
+
     // CONSTRUCTOR
-    public testRegEx() {
+    public testeR() {
     }
 
     public static void main(String arg[]) throws Exception {
         if (arg.length == 0) {
             return;
         } else {
-            if (arg.length == 2){
-                // daar PATTERN [FILE]
-                regEx = arg[0];
-                System.out.println("regEx : " + regEx);
-                fileName = arg[1];
-                System.out.println(" >> file name : " + fileName);
-                // System.out.println(" >> Parsing regEx \"" + regEx + "\".");
-                // System.out.println(" >> ...");
-            }else if (arg.length == 3){
-                // daar [OPTIONS] PATTERN [FILE]
-                System.out.println("nb arg 3 ");
-                option = arg[0];
-                regEx = arg[1];
-                fileName = arg[2];
-                System.out.println("regEx : " + regEx);
-                System.out.println(" >> option : " + option);
-                System.out.println(" >> file name : " + fileName);
-                return;
-            }else{
-                return;
+            regEx = arg[0];
+            fileName = arg[1];
+            //System.out.println(" >> file name : " + fileName);
+            //System.out.println("regEx : " + regEx);
+            boolean allChar = false;
+
+            if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
+                //System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
+                regEx = regEx.substring(1, regEx.length() - 1);
+                allChar = true;
             }
+            //System.out.println("1 regEx : " + regEx);
 
 
             if (regEx.length() < 1) {
@@ -61,14 +59,17 @@ public class testRegEx {
                     ArrayList<String> lines = getLinesFiles(fileName);
 
                     File file = new File(fileName);
-
+                    boolean non = false;
                     if (isRegex(regEx)) {
                         System.out.println("....Method1.....");
-                        RegExTree ret = parse();
+                        RegExTree ret = parse(allChar);
                         NFA n = ret.toAutomaton();
-                        n.print();
+                        // n.print();
                         DFA d = n.to_DFA();
-                        d.print();
+                        // d.print();
+                        System.out.println("................................");
+                        // d.minDFA();
+                        System.out.println("................................");
 
                         if (isRegex(regEx)) {
                             if (regEx.contains("\n")) {
@@ -84,28 +85,55 @@ public class testRegEx {
                             }
                         }
                     } else {
-                        // method 3
-                        System.out.println("1 ....Method3.....");
-                        File cache = new File("cache_" + fileName);
-                        if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
-                            System.out.println(" 2 ....Method3.....");
-                            if (!cache.exists()) {
-                                try {
-                                    Indexing.makeCash(Indexing.FileToStrings(file), fileName);
-                                } catch (Exception e) {
-                                    System.out.println("ERREUR" + e);
+                        //egrep 
+                        System.out.println("egrep");
+                        String c = "egrep help text1";
+                        Instant start = Instant.now();
+                        final Process process = Runtime.getRuntime().exec(c);
+                        Instant finish = Instant.now();
+                        long timeElapsed = Duration.between(start, finish).toMillis(); 
+                        System.out.println(timeElapsed);
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                            String line = "";
+                            try {
+                                while((line = reader.readLine()) != null) {
+                                    System.out.println(line);
                                 }
+                            } finally {
+                                reader.close();
                             }
-
-                            Trie t = Indexing.trieFromFile(cache);
-                            System.out.println(t.search(regEx));
-                            printWordsInColor(regEx,FileToStrings(file),t.search(regEx));
-                        } else {
-                            // KMP (method 2)
-                            System.out.println("....Method2.....");
-                            ArrayList<ArrayList<Integer>> result = mainKMP(lines);
-                            printWordsInColorKMP(regEx,lines,result);
+                        // method 3
+                        HashMap<String, Integer> map = Indexing.toHashInt(Indexing.FileToStrings(file));
+                        ArrayList<String> keysAsArray = new ArrayList<String>(map.keySet());
+                        Random r = new Random();
+                        String regEx = keysAsArray.get(r.nextInt(keysAsArray.size()));
+                        System.out.println("1 ....Method3.....");
+                        start = Instant.now();
+                        File cache = new File("cache_" + fileName);
+                        System.out.println(" 2 ....Method3.....");
+                        if (!cache.exists()) {
+                            try {
+                                Indexing.makeCash(Indexing.FileToStrings(file), fileName);
+                            } catch (Exception e) {
+                                System.out.println("ERREUR" + e);
+                            }
                         }
+
+                        Trie t = Indexing.trieFromFile(cache);
+                        t.search(regEx);
+                        finish = Instant.now();
+                        timeElapsed = Duration.between(start, finish).toMillis(); 
+                        System.out.println(timeElapsed);
+                        printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
+                                // KMP (method 2)
+                        System.out.println("....Method2.....");
+                        start = Instant.now();
+                        ArrayList<ArrayList<Integer>> result = mainKMP(lines);
+                        finish = Instant.now();
+                        timeElapsed = Duration.between(start, finish).toMillis(); 
+                        System.out.println(timeElapsed);
+                        printWordsInColorKMP(regEx, lines, result);
+                
                     }
 
                 } catch (Exception e) {
@@ -125,7 +153,7 @@ public class testRegEx {
             // System.err.println("line : " + line);
 
             ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
-            if(matching.size()>0)
+            if (matching.size() > 0)
                 result.addAll(matching);
         }
         System.out.println("[M1] word match: " + result);
@@ -141,11 +169,12 @@ public class testRegEx {
         for (String line : lines) {
             i++;
             ArrayList<ArrayList<Integer>> matching = search.matchingWords(regEx.toCharArray(), retenue,
-                    line.toCharArray(), i);
+                    line.toCharArray(), i-1);
             if (matching.size() > 0)
                 result.addAll(matching);
         }
-        // System.out.println("word match: " + result);
+       // System.out.println(">>>>>>>>>> result: " + result.size());
+
         return result;
     }
 
@@ -178,11 +207,16 @@ public class testRegEx {
             String s2 = (String) indext;
             s2 = s2.substring(1, s2.length());
             int index = Integer.parseInt(s2);
-            String line = lines.get(lineNum-1);
+            String line = lines.get(lineNum - 1);
             System.out.println(line);
+
             System.out.println(
-                    line.substring(0, index - 1) + ANSI_RED + line.substring(index - 1, index + reg.length() - 1)
-                            + ANSI_RESET + line.substring(index + reg.length() - 1, line.length()));
+                    ANSI_RESET +
+                            line.substring(0, index - 1) +
+                            ANSI_RED +
+                            (index > 0 ?line.substring(index - 1, index + reg.length() - 1):"")
+                            + ANSI_RESET +
+                            ((index + reg.length()-1) > line.length() ?  line.substring(index + reg.length() - 1, line.length()) : ""));
 
         }
     }
@@ -195,12 +229,13 @@ public class testRegEx {
             // System.out.println(index);
 
             String line = lines.get(ti.get(i).get(0) - 1);
-            System.out.println(
-                    line.substring(0, ti.get(i).get(1) - 1) +
-                            ANSI_RED +
+
+            System.out.println( ANSI_RESET +
+                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1): "") +
+                            RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
                             ANSI_RESET +
-                            line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()));
+                            ( ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()-1) : ""));
 
         }
     }
@@ -223,9 +258,9 @@ public class testRegEx {
             System.out.println(
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                             ANSI_RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1)  +
+                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
                             ANSI_RESET +
-                            (line.length()>ti.get(i).get(2)? line.substring(ti.get(i).get(2), line.length()) : ""));
+                            (line.length() > ti.get(i).get(2) ? line.substring(ti.get(i).get(2), line.length()) : ""));
         }
     }
 
@@ -237,7 +272,7 @@ public class testRegEx {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
 
-                if(line.length() != 0) {
+                if (line.length() != 0) {
                     lines.add(line);
                     // System.out.println(i + ">>>>>>> : " + line);
                 }
@@ -269,7 +304,7 @@ public class testRegEx {
     }
 
     // FROM REGEX TO SYNTAX TREE
-    private static RegExTree parse() throws Exception {
+    private static RegExTree parse(boolean allChar) throws Exception {
         // BEGIN DEBUG: set conditionnal to true for debug example
         if (false)
             throw new Exception();
@@ -279,13 +314,26 @@ public class testRegEx {
         // END DEBUG
 
         ArrayList<RegExTree> result = new ArrayList<RegExTree>();
-        for (int i = 0; i < regEx.length(); i++)
-            result.add(new RegExTree(charToRoot(regEx.charAt(i)), new ArrayList<RegExTree>()));
+        for (int i = 0; i < regEx.length(); i++) {
+            boolean ignore = false;
 
+            if (regEx.charAt(i) == '\\') {
+                ignore = true;
+
+                i++;
+            }
+
+            if (allChar)
+                result.add(new RegExTree(charToRoot(regEx.charAt(i), true), new ArrayList<RegExTree>()));
+            else
+                result.add(new RegExTree(charToRoot(regEx.charAt(i), ignore), new ArrayList<RegExTree>()));
+        }
         return parse(result);
     }
 
-    private static int charToRoot(char c) {
+    private static int charToRoot(char c, boolean ignore) {
+        if (ignore)
+            return (int) c;
         if (c == '.')
             return DOT;
         if (c == '*')
@@ -880,6 +928,43 @@ class DFA {
     }
 
     // etape 4
+    /*public void minDFA() {
+
+        int nbStatesVisited = 1;
+        int nbStates = this.Transitions.size();
+        ArrayList<Integer> nextState = new ArrayList<Integer>();
+
+        ArrayList<Integer> stateInA = new ArrayList<Integer>();
+        ArrayList<Integer> stateInB = new ArrayList<Integer>();
+
+        ArrayList<Integer> stateOutA = new ArrayList<Integer>();
+        ArrayList<Integer> stateOutB = new ArrayList<Integer>();
+
+        int idTransiVersA = -1;
+        int idTransiVersB = -1;
+
+        // on commence par les états init
+        for (ArrayList<Integer> q0State : this.q0) {
+            // idTransiVersA = curTrans;
+            System.out.println("--------------------------------------------");
+            System.out.println("q0State  : " + q0State );
+
+            System.out.println("    truc : " + this.Transitions.get(q0State));
+            System.out.println("    truc 2 : " + this.Transitions.get(q0State).keySet());
+
+            // pour chaque etat avec la transition
+            for (Integer curIdTrans : this.Transitions.get(q0State).keySet()) {
+                System.out.println("    les transistion je me deplase de q0 : " + curIdTrans);
+                System.out.println("    truc 3 : " + this.Transitions.get(q0State).get(curIdTrans));
+
+                // pour chaque etats où je peut aller, je vérifie si je lui resemble
+                for (ArrayList<Integer> curState : this.Transitions.get(q0State).get(curIdTrans)) {
+                    System.out.println("    les etats où je peut aller a partir de q0 : " + curIdTrans);
+                }
+            }
+        }
+    }*/
+
     public void minDFA() {
         /**
          * pour chaque transition de A vers B avec x, on vérifie si A est un etat

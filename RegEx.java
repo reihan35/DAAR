@@ -1,10 +1,11 @@
+import java.util.concurrent.TimeUnit;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Exception;
 import java.util.Random;
 import java.io.*;
-
+import java.time.*;
 
 // java RegEx '`S(a|r|g)*on`' text1
 
@@ -32,6 +33,21 @@ public class RegEx {
     }
 
     public static void main(String arg[]) throws Exception {
+        String c = "egrep help text1";
+        Instant start = Instant.now();
+        final Process process = Runtime.getRuntime().exec(c);
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis(); 
+        System.out.println(timeElapsed);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+            try {
+                while((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            } finally {
+                reader.close();
+            }
         if (arg.length == 0) {
             return;
         } else {
