@@ -135,6 +135,7 @@ public class RegEx {
                                 }
 
                                 if (true) {
+                                    System.out.println(" true: " + Macros.RED + result.size());
                                     printWordsInColorM1WithIdLine(lines, result);
                                 } else
                                     printWordsInColorM1(lines, result);
@@ -292,14 +293,14 @@ public class RegEx {
         String ANSI_RED = "\u001B[42m";
 
         for (int i = 0; i < ti.size(); i++) {
-            if (i == mNB)
+            if (m && i == mNB)
                 break;
             String line = lines.get(ti.get(i).get(0) - 1);
             System.out.println(Macros.BLUE_BOLD + ti.get(i).get(0) + Macros.GREEN + ": " + Macros.RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                    ANSI_RED +
+                    Macros.RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
-                    ANSI_RESET +
+                    Macros.RESET +
                     (line.length() > ti.get(i).get(2) ? line.substring(ti.get(i).get(2), line.length()) : ""));
         }
     }
