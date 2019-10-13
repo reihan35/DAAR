@@ -240,6 +240,7 @@ public class RegEx {
 
     }
 
+    //Cette fonction renvoie la liste des lignes d'un fichier
     public static ArrayList<String> FileToStrings(File fileName) {
         try {
             String line = null;
@@ -257,7 +258,7 @@ public class RegEx {
             return null;
         }
     }
-
+    //Cette fonction affiche les résultats de Radix Tree en coloriant les motifs retrouvés
     public static void printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
@@ -283,6 +284,7 @@ public class RegEx {
         }
     }
 
+    //Cette fonction affiche les résultats de KMP en coloriant les motifs retrouvés
     public static void printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
@@ -300,7 +302,7 @@ public class RegEx {
         }
     }
 
-
+    //Cette fonction affiche les résultats de la méthode des automates en coloriant les motifs retrouvés
     public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti, boolean BEG, boolean END) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
@@ -390,6 +392,7 @@ public class RegEx {
         }
     }
 
+    //Cette fonction verifie si une chaine de caracter est un regex
     private static boolean isRegex(String str) {
         return ((!str.equals("")) && (str != null) && (str.contains(".") || str.contains("*") || str.contains("|")
                 || str.contains("(") || str.contains(")") || str.contains("^") || str.contains("?") || str.contains("$") || str.contains("\\n")));
@@ -644,10 +647,11 @@ class NFA {
     public NFA(ArrayList<Integer> Q, ArrayList<Integer> Sigma, int Q0, int F,
                HashMap<Integer, ArrayList<Tuple>> Transitions) {
         this.q = Q; // les etats existant
-        this.Sigma = Sigma; //
+        this.Sigma = Sigma; //L'alphanet
         this.q0 = Q0; // etat initial
         this.f = F; // etat finale
-        this.Transitions = Transitions;
+        this.Transitions = Transitions;  //tableau de transition
+
     }
 
     public ArrayList<Integer> getQ() {
@@ -680,6 +684,7 @@ class NFA {
         Transitions.put(s1, tmp);
     }
 
+    //Cette fontion rajoute les transitions d'un tableau t2 en un tableau t1
     public HashMap<Integer, ArrayList<Tuple>> merge(HashMap<Integer, ArrayList<Tuple>> t1,
                                                     HashMap<Integer, ArrayList<Tuple>> t2) {
 
@@ -689,6 +694,7 @@ class NFA {
         return m;
     }
 
+    //Cette fonction traduit l'algo du livre Aho-Ullman pour la concatentaion
     public NFA concaten(NFA A2) {
         q.addAll(A2.q); // On rajoute les étas de A2
 
@@ -706,6 +712,7 @@ class NFA {
         return new NFA(q, Sigma, q0, f, m);
     }
 
+    //Cette fonction traduit l'algo du livre Aho-Ullman pour *
     public NFA etoil() {
         int r1 = 0;
         int r2 = 0;
@@ -728,6 +735,7 @@ class NFA {
         return new NFA(q, Sigma, q0, f, Transitions);
     }
 
+    //Cette fonction traduit l'algo du livre Aho-Ullman pour |
     public NFA altern(NFA A2) {
         int r1 = 0;
         int r2 = 0;
@@ -757,7 +765,7 @@ class NFA {
         f = r2;
         return new NFA(q, Sigma, q0, f, m);
     }
-
+     //Fonction d'affichage des transitions
     public void print_transitions() {
         for (int key : this.Transitions.keySet()) {
             ArrayList<Tuple> value = Transitions.get(key);
@@ -770,6 +778,7 @@ class NFA {
         System.out.println("}");
     }
 
+    //Fonction d'affichage de NFA
     public void print() {
         System.out.println("{  Q :" + this.getQ());
         System.out.println("  Q0 :" + q0);
@@ -782,6 +791,7 @@ class NFA {
         print_transitions();
     }
 
+    //Fonction qui calcule la valaur eclosur d'un etat
     public ArrayList<Integer> eclosure(int i) {
         ArrayList<Integer> res = new ArrayList<Integer>();
         res.add(i);
@@ -792,8 +802,9 @@ class NFA {
             }
         }
         return res;
-    }
+    }//Fonction qui calcule la valaur eclosur d'un etat
 
+    //Cette fonction renvoie touts les etats qui peuvent etre travaerses à partir d'un etat state avec un symbole
     public ArrayList<Integer> state_can_travers(int state, int alphabet) {
         ArrayList<Integer> res = new ArrayList<Integer>();
         ArrayList<Tuple> a = Transitions.get(state);
@@ -825,7 +836,8 @@ class NFA {
     }
 
     // {[2 3 1] : {[5 6 7]:a , [8 9 10]:b}}
-
+    
+    //Cette fontion transforme un automate fini non deterministe avec des epsilon transition en automate determinist
     public DFA to_DFA() {
         ArrayList<Integer> eclosures = eclosure(q0); // On a calculer les e-closures des états
         ArrayList<ArrayList<Integer>> new_states = new ArrayList<ArrayList<Integer>>();
@@ -896,7 +908,7 @@ class NFA {
     }
 
 }
-
+//Une class pour representer les transitions dans le NFA
 class Tuple {
     protected int a;
     protected int b;
@@ -1023,6 +1035,7 @@ class DFA {
         this.f = F;
         this.Transitions = Transitions;
     }
+     //Class pour les automates finie deterministe
 
     public void minDFA() {
         /**

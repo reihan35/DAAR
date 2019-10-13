@@ -9,8 +9,10 @@ import java.time.*;
 
 // java RegEx '`S(a|r|g)*on`' text1
 
-//FICHIER DE TEST POUR KMP ET RADIX TREE
+
 public class testeR {
+    /**CLASS QUI GENERE DES FICHIER DE TEST POUR KMP ET RADIX TREE ET QUI LANCE DES TESTES DESSUS
+    **/
     // MACROS
     static final int CONCAT = 0xC04CA7;
     static final int ETOILE = 0xE7011E;
@@ -119,7 +121,8 @@ public class testeR {
                 }
             writer.close();            
             }
-    } 
+    }
+    //Cette fonction genere des fichier de tailles 10K,100K et 1M le nbr de fichier par taille est passé en param
     public static void generateFiles(int nbr) throws Exception{
         new File("baseDeTest").mkdir();
         new File("baseDeTest//10K").mkdir();
@@ -169,7 +172,7 @@ public class testeR {
             
         }
     }
-
+    //Cette fonction cree et genere des mots aleatoir en prenant des lettres aleatoires et avec des longueur qui correspond aux meme que la distribution de longueur de lettre en anglais
     public static ArrayList<String> wordsLanguage(){
         ArrayList<Character> alphabet = new ArrayList<Character>();
         alphabet.add('a');
@@ -241,7 +244,7 @@ public class testeR {
         //System.out.println(words);
        return words;
     }
-
+    //Cette fonction genere un fichier de taille passé en parametre avec les mots construit avant
     public static void generateFileEnglish(int taille,String fileName, File dir) throws Exception{
         int cpt = 0;
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, fileName)));
@@ -261,76 +264,6 @@ public class testeR {
             }
         }
         writer.close();
-    }
-
-    public static void generateFile(int taille,String fileName, File dir) throws Exception{
-        ArrayList<Character> alphabet = new ArrayList<Character>();
-        alphabet.add('a');
-        alphabet.add('b');
-        alphabet.add('c');
-        alphabet.add('d');
-        alphabet.add('e');
-        alphabet.add('f');
-        alphabet.add('g');
-        alphabet.add('h');
-        alphabet.add('i');
-        alphabet.add('j');
-        alphabet.add('k');
-        alphabet.add('l');
-        alphabet.add('m');
-        alphabet.add('n');
-        alphabet.add('o');
-        alphabet.add('p');
-        alphabet.add('q');
-        alphabet.add('r');
-        alphabet.add('s');
-        alphabet.add('t');
-        alphabet.add('u');
-        alphabet.add('v');
-        alphabet.add('w');
-        alphabet.add('x');
-        alphabet.add('y');
-        alphabet.add('z');
-        int cpt = 0;
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, fileName)));
-        System.out.println(writer);
-        while(cpt < taille){
-            Random r = new Random();
-            int low = 3;
-            int high = 10;
-            int result = r.nextInt(high-low) + low;
-            String s = "";
-            int low2 = 0;
-            int high2 = 25;
-            for(int i = 0 ; i<result ; i++){
-                int r2 = r.nextInt(25);
-                s = s + alphabet.get(r2);
-            }
-            //System.out.println("waiting");
-            writer.write(s + " ");
-            cpt++;
-            if(cpt%18==0){
-                writer.write("\n");  
-            }
-        }
-        writer.close();
-    }
-
-    public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
-        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
-        Search search = new Search();
-
-        int i = 0;
-        for (String line : lines) {
-            i++;
-            // System.err.println("line : " + line);
-
-            ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
-            if (matching.size() > 0)
-                result.addAll(matching);
-        }
-        System.out.println("[M1] word match: " + result);
-        return result;
     }
 
     public static ArrayList<ArrayList<Integer>> mainKMP(ArrayList<String> lines, String regEx) {

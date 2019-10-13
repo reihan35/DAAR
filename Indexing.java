@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 
 public class Indexing{
+    /**
+    CLASS AVEC LA METHODE DE RECHERCHE DE RADIX TREE
+    **/
 
     public static void main(String[] args) {
         /*File file = new File("text1");
@@ -277,8 +280,41 @@ class Trie {
 
         }
     }
-    //Recherche d'un mot dans le trie
-    public ArrayList<ArrayList<Integer>> search(String word) {
+
+    //Recherche d'un mot dans le trie sans prefixe
+     public ArrayList<ArrayList<Integer>> searchEntier(String word) {
+
+        HashMap<Character, TrieNode> children = root.getChildren();
+        ArrayList<Character> a = new ArrayList<Character>();
+        TrieNode node = null;
+         String mot = "";
+        for (int i = 0;i<word.length();i++){
+            Character c = word.charAt(i);
+            mot = mot + Character.toLowerCase(c);
+        }
+        for(int i = 0; i < mot.length(); i++) {
+            char c = mot.charAt(i);
+            if(children.containsKey(c)) {
+                node = children.get(c);
+                children = node.getChildren();
+            } else { 
+                node = null;
+                break;
+            }
+        }
+        if(node != null && node.getWordOccurences()!=null ) {
+            return node.getWordOccurences();
+        } else {
+            
+            return null;
+        
+        }
+
+    }
+
+    //Recherche d'un mot dans le trie avec prefixe
+    public ArrayList<ArrayList<Integer>> search(String word) { 
+        System.out.println("je rentre dans search");
 
         HashMap<Character, TrieNode> children = root.getChildren();
         ArrayList<Character> a = new ArrayList<Character>();
@@ -303,6 +339,7 @@ class Trie {
         } else {
             if(node!=null && node.getChildren().size()>0){
                 ArrayList<ArrayList<Integer>> wo= new ArrayList<ArrayList<Integer>>();
+                System.out.println("je comprend bien qu'il faut venir ici");
                 if(node.getWordOccurences()!=null)
                     wo.addAll(node.getWordOccurences());
                 for (Character c : node.getChildren().keySet()) {
