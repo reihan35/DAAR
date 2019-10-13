@@ -9,6 +9,7 @@ import java.time.*;
 
 // java RegEx '`S(a|r|g)*on`' text1
 
+//FICHIER DE TEST POUR KMP ET RADIX TREE
 public class testeR {
     // MACROS
     static final int CONCAT = 0xC04CA7;
