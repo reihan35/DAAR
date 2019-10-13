@@ -24,6 +24,7 @@ public class testeR {
     private static String regEx;
     private static String folderName;
     private static String option = null;
+    private static ArrayList<String> words = wordsLanguage();
 
 
     static final String RED = "\033[0;31m"; // RED
@@ -33,82 +34,235 @@ public class testeR {
     }
 
     public static void main(String arg[]) throws Exception {
-        if (arg.length == 0) {
+        /*if (arg.length == 0) {
             try{
-                generateFile(100,"fichier1");
+                generateFiles(10);
             }catch(Exception e){
                 System.out.println(e);
             }
             return;
-        } else {
-
-
+        } else {*/
+            generateFiles(100);
             folderName = arg[0];
             final File folder = new File(folderName);
-            for (final File file : folder.listFiles()) {
-                System.out.println(file.getName());
-            
-                ArrayList<String> lines = getLinesFiles(folderName + file.getName());
-                HashMap<String, Integer> map = Indexing.toHashInt(Indexing.FileToStrings(file));
-                ArrayList<String> keysAsArray = new ArrayList<String>(map.keySet());
-                Random r = new Random();
-                String regEx = keysAsArray.get(r.nextInt(keysAsArray.size()));
-                System.out.println(regEx);
-
-                //egrep 
-                System.out.println("egrep");
-                //System.out.println("path :" + folderName + file.getName());
-                String c = "egrep " + regEx +" "+ folderName + file.getName();
-                Instant start = Instant.now();
-                final Process process = Runtime.getRuntime().exec(c);
-                Instant finish = Instant.now();
-                long timeElapsed = Duration.between(start, finish).toMillis(); 
-                System.out.println(timeElapsed);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line = "";
-                    try {
-                        while((line = reader.readLine()) != null) {
-                            //System.out.println(line);
+            for (final File folder1 : folder.listFiles()) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(new File(folder1.getName())));
+                for (final File file : folder1.listFiles()) {
+                    System.out.println(file.getName());
+                    ArrayList<String> lines = getLinesFiles(folderName + folder1.getName()+ "//" +file.getName());
+                    Random r = new Random();
+                    String regEx = words.get(r.nextInt(words.size()));
+                    System.out.println(regEx);
+                    //egrep 
+                    //System.out.println("egrep");
+                    //System.out.println("path :" + folderName + file.getName());
+                    writer.write(file.getName()+ " "); //LE NOM DU FICHIER
+                    writer.write(regEx + " ");
+                    String c2 = "egrep " + "-c " + regEx +" "+ folderName + folder1.getName()+ "/" + file.getName();
+                    System.out.println(c2);
+                    final Process process2 = Runtime.getRuntime().exec(c2);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+                        String line = "";
+                        try {
+                            while((line = reader.readLine()) != null) {
+                                System.out.println("je rentre");
+                                writer.write(line + " "); //LE NBR MOT AVEC EGREP
+                            }
+                        } finally {
+                            reader.close();
                         }
-                    } finally {
-                        reader.close();
+
+                    String c = "egrep " + regEx +" "+ folderName + file.getName();
+                    Instant start = Instant.now();
+                    final Process process = Runtime.getRuntime().exec(c);
+                    Instant finish = Instant.now();
+                    long timeElapsed = Duration.between(start, finish).toNanos(); 
+                    System.out.println(timeElapsed);
+                    
+                    writer.write(timeElapsed + " "); //LE TEMPS AVEC EGREP
+                    
+                    // method 3
+                    
+                   // System.out.println("1 ....Method3.....");
+                    File cache = new File("cache_" + file.getName());
+                    //System.out.println(" 2 ....Method3.....");
+                    if (!cache.exists()) {
+                        try {
+                            Indexing.makeCash(Indexing.FileToStrings(file), file.getName());
+                        } catch (Exception e) {
+                           // System.out.println("ERREUR" + e);
+                        }
                     }
-                // method 3
-                
-                System.out.println("1 ....Method3.....");
-                start = Instant.now();
-                File cache = new File("cache_" + file.getName());
-                //System.out.println(" 2 ....Method3.....");
-                if (!cache.exists()) {
-                    try {
-                        Indexing.makeCash(Indexing.FileToStrings(file), file.getName());
-                    } catch (Exception e) {
-                       // System.out.println("ERREUR" + e);
+
+                    Trie t = Indexing.trieFromFile(cache);
+                    start = Instant.now();
+                    t.search(regEx);
+                    finish = Instant.now();
+                    timeElapsed = Duration.between(start, finish).toNanos(); 
+                    System.out.println(timeElapsed);
+                    int nb = printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
+                    writer.write( Integer.toString(nb)+ " ");
+                    writer.write(timeElapsed + " "); //LE TEMPS AVEC M2*/
+
+                    // KMP (method 2)
+                    //System.out.println("....Method2.....");
+                    start = Instant.now();
+                    ArrayList<ArrayList<Integer>> result = mainKMP(lines,regEx);
+                    finish = Instant.now();
+                    timeElapsed = Duration.between(start, finish).toNanos(); 
+                    System.out.println(timeElapsed);
+                    int nb2 = printWordsInColorKMP(regEx, lines, result);
+                    writer.write( Integer.toString(nb2)+ " ");
+                    writer.write(timeElapsed + " "); //LE TEMPS AVEC M3
+                    writer.write("\n");
+                }
+            writer.close();            
+            }
+    } 
+    public static void generateFiles(int nbr) throws Exception{
+        new File("baseDeTest").mkdir();
+        new File("baseDeTest//10K").mkdir();
+        new File("baseDeTest//100K").mkdir();
+        new File("baseDeTest//1M").mkdir();
+        System.out.println("BAAH OUII");
+        //File f = new File("baseDeTest");
+        File f10 = new File("baseDeTest//10K//");
+        File f2 = new File("baseDeTest//100K//");
+        File fM = new File("baseDeTest//1M//");
+
+        ArrayList<Integer> a = new ArrayList<Integer>();
+        a.add(10000);
+        a.add(100000);
+        a.add(1000000);
+        String s = "";
+        for(int taille : a){
+            if(taille == 10000){
+                s = "fichier10K";
+                for(int i = 0 ; i< nbr;i++){
+                    System.out.println("ALO");
+                    generateFileEnglish(taille,s + (i+1),f10);
+                    //System.out.println(i);
+                }
+            }
+            else{
+                if(taille == 100000){
+                    System.out.println("ALO");
+
+                    s = "fichier100K";
+                    for(int i = 0 ; i< nbr;i++){
+                        System.out.println("ALO");
+                        generateFileEnglish(taille,s + (i+1),f2);
+                        //System.out.println(i);
                     }
                 }
-
-                Trie t = Indexing.trieFromFile(cache);
-                t.search(regEx);
-                finish = Instant.now();
-                timeElapsed = Duration.between(start, finish).toMillis(); 
-                System.out.println(timeElapsed);
-                //printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
-                
-                // KMP (method 2)
-                System.out.println("....Method2.....");
-                start = Instant.now();
-                ArrayList<ArrayList<Integer>> result = mainKMP(lines,regEx);
-                finish = Instant.now();
-                timeElapsed = Duration.between(start, finish).toMillis(); 
-                System.out.println(timeElapsed);
-                
-                //printWordsInColorKMP(regEx, lines, result);
-                
+                else {
+                    if(taille == 1000000){
+                        s = "fichier1M";
+                        for(int i = 0 ; i< nbr;i++){
+                            generateFileEnglish(taille,s + (i+1),fM);
+                            //System.out.println(i);
+                        }
+                    }
+                }
             }
             
         }
-    } 
-    public static void generateFile(int taille,String fileName) throws Exception{
+    }
+
+    public static ArrayList<String> wordsLanguage(){
+        ArrayList<Character> alphabet = new ArrayList<Character>();
+        alphabet.add('a');
+        alphabet.add('b');
+        alphabet.add('c');
+        alphabet.add('d');
+        alphabet.add('e');
+        alphabet.add('f');
+        alphabet.add('g');
+        alphabet.add('h');
+        alphabet.add('i');
+        alphabet.add('j');
+        alphabet.add('k');
+        alphabet.add('l');
+        alphabet.add('m');
+        alphabet.add('n');
+        alphabet.add('o');
+        alphabet.add('p');
+        alphabet.add('q');
+        alphabet.add('r');
+        alphabet.add('s');
+        alphabet.add('t');
+        alphabet.add('u');
+        alphabet.add('v');
+        alphabet.add('w');
+        alphabet.add('x');
+        alphabet.add('y');
+        alphabet.add('z');
+ 
+        DistributedRandomNumberGenerator d = new DistributedRandomNumberGenerator();
+        d.addNumber(1,0.1/100);
+        d.addNumber(2,0.1/100);
+        d.addNumber(3,0.6/100);
+        d.addNumber(4,2.6/100);
+        d.addNumber(5,5.2/100);
+        d.addNumber(6,8.5/100);
+        d.addNumber(7,12.2/100);
+        d.addNumber(8,14/100);
+        d.addNumber(9,14/100);
+        d.addNumber(10,12.6/100);
+        d.addNumber(11,10.1/100);
+        d.addNumber(12,7.5/100);
+        d.addNumber(13,5.2/100);
+        d.addNumber(14,3.2/100);
+        d.addNumber(15,2.0/100);
+        d.addNumber(16,1.0/100);
+        d.addNumber(17,0.6/100);
+        d.addNumber(18,0.3/100);
+        d.addNumber(19,0.2/100);
+        d.addNumber(20,0.1/100);
+        d.addNumber(21,0.1/100);
+
+        ArrayList<String> words = new ArrayList<String>();
+        Random r = new Random();
+        String s = "";
+        int taille = 0;
+        for (int i = 0; i < 1000;i++){
+            taille = d.getDistributedRandomNumber();
+            while (taille == 1){
+                taille = d.getDistributedRandomNumber();
+            }
+            for(int j = 0 ; j<taille ; j++){
+                int r2 = r.nextInt(25);
+                s = s + alphabet.get(r2);
+            }
+            words.add(s);
+            s = "";
+        }
+        //System.out.println(words);
+       return words;
+    }
+
+    public static void generateFileEnglish(int taille,String fileName, File dir) throws Exception{
+        int cpt = 0;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, fileName)));
+        for(int i = 0; i<words.size();i++){
+            writer.write( words.get(i) + " ");
+             if(i%18==0){
+                writer.write("\n");  
+            }
+        }
+        while(cpt < taille-1000){
+            Random r = new Random();
+            int result = r.nextInt(words.size());
+            writer.write( words.get(result) + " ");
+            cpt++;
+            if(cpt%18==0){
+                writer.write("\n");  
+            }
+        }
+        writer.close();
+    }
+
+    public static void generateFile(int taille,String fileName, File dir) throws Exception{
         ArrayList<Character> alphabet = new ArrayList<Character>();
         alphabet.add('a');
         alphabet.add('b');
@@ -137,7 +291,7 @@ public class testeR {
         alphabet.add('y');
         alphabet.add('z');
         int cpt = 0;
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, fileName)));
         System.out.println(writer);
         while(cpt < taille){
             Random r = new Random();
@@ -151,7 +305,7 @@ public class testeR {
                 int r2 = r.nextInt(25);
                 s = s + alphabet.get(r2);
             }
-            System.out.println(s);
+            //System.out.println("waiting");
             writer.write(s + " ");
             cpt++;
             if(cpt%18==0){
@@ -195,6 +349,7 @@ public class testeR {
         return result;
     }
 
+
     public static ArrayList<String> FileToStrings(File fileName) {
         try {
             String line = null;
@@ -213,9 +368,10 @@ public class testeR {
         }
     }
 
-    public static void printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+    public static int printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
+        int cpt = 0;
         for (int i = 0; i < ti.size(); i++) {
             Object lineNumt = ti.get(i).get(0);
             String s = (String) lineNumt;
@@ -225,8 +381,9 @@ public class testeR {
             s2 = s2.substring(1, s2.length());
             int index = Integer.parseInt(s2);
             String line = lines.get(lineNum - 1);
-            System.out.println(line);
-
+            //System.out.println(line);
+            cpt++;
+            //System.out.println("hhhhhhhhhhh" + i);
             System.out.println(
                     ANSI_RESET +
                             line.substring(0, index - 1) +
@@ -236,17 +393,20 @@ public class testeR {
                             ((index + reg.length()-1) > line.length() ?  line.substring(index + reg.length() - 1, line.length()) : ""));
 
         }
+        System.out.println("nbr de motif radix" + cpt);
+        return cpt;
     }
 
-    public static void printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+    public static int printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
+        int cpt = 0;
         for (int i = 0; i < ti.size(); i++) {
 
             // System.out.println(index);
 
             String line = lines.get(ti.get(i).get(0) - 1);
-
+            cpt++;
             System.out.println( ANSI_RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1): "") +
                             RED +
@@ -255,6 +415,8 @@ public class testeR {
                             ( ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length()-1) : ""));
 
         }
+        System.out.println("nbr motif KMP" + cpt);
+        return cpt;
     }
 
     public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
@@ -552,6 +714,68 @@ public class testeR {
         subTrees.add(a);
         subTrees.add(dotBCEtoile);
         return new RegExTree(ALTERN, subTrees);
+    }
+}
+
+class DistributedRandomNumberGenerator {
+
+    private HashMap<Integer, Double> distribution;
+    private double distSum;
+
+    public DistributedRandomNumberGenerator() {
+        distribution = new HashMap<>();
+    }
+
+    public void addNumber(int value, double distribution) {
+        if (this.distribution.get(value) != null) {
+            distSum -= this.distribution.get(value);
+        }
+        this.distribution.put(value, distribution);
+        distSum += distribution;
+    }
+
+    public int getDistributedRandomNumber() {
+        double rand = Math.random();
+        double ratio = 1.0f / distSum;
+        double tempDist = 0;
+        for (Integer i : distribution.keySet()) {
+            tempDist += distribution.get(i);
+            if (rand / ratio <= tempDist) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+}
+class RandomItem{
+    private int[] numbers;
+    private double[] probs;
+    private Random rand;
+    
+    public RandomItem(int[] numbers, double[] probs){
+        this.numbers = numbers;
+        this.probs = probs;
+        rand = new Random();
+    }
+    
+    public int random(){
+        double p = rand.nextDouble();
+        while (p==0){
+            p = rand.nextDouble();
+        }
+        double sum = 0.0;
+        int i = 0;
+        while(sum < p){
+            System.out.println("p "+ p);
+            sum += probs[i];
+            System.out.println("p ["+ i + "] "  + probs[i]);
+            i++;
+            System.out.println(i);
+            System.out.println("sum" + sum);
+        }
+        i = i - 1;
+        return numbers[i];
     }
 }
 
