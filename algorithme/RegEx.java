@@ -77,7 +77,7 @@ public class RegEx {
 
             // ok 1.option l :
             if (option.contains("l")) {
-                System.out.println("File name : " + Macros.PURPLE_BOLD + fileName);
+                System.out.println("File name : " + PURPLE_BOLD + fileName);
                 return;
             }
 
@@ -908,40 +908,7 @@ class NFA {
     }
 
 }
-//Une class pour representer les transitions dans le NFA
-class Tuple {
-    protected int a;
-    protected int b;
 
-    public Tuple(int a, int b) {
-        this.a = a;
-        this.b = b;
-    }
-
-    public void addA(int a) {
-        a = a;
-    }
-
-    public void addB(int b) {
-        b = b;
-    }
-
-    public int getA() {
-        return a;
-    }
-
-    public int getB() {
-        return b;
-    }
-
-    public String toString() {
-        if (b == 0) {
-            return "va vers " + a + " avec un epsilon";
-        } else {
-            return "va vers " + a + " avec un " + Character.toString((char) b);
-        }
-    }
-}
 
 // UTILITARY CLASS
 class RegExTree {
