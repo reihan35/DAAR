@@ -19,6 +19,8 @@ public class RegEx {
     static final int PARENTHESEOUVRANT = 0x16641664;
     static final int PARENTHESEFERMANT = 0x51515151;
     static final int DOT = 0xD07;
+    static final int POINTINTERROGATION = 0xF07;
+
 
     // REGEX
     private static String regEx;
@@ -94,7 +96,7 @@ public class RegEx {
                         NFA n = ret.toAutomaton();
                         // n.print();
                         DFA d = n.to_DFA();
-                        // d.print();
+                        d.print();
                         System.out.println("................................");
                         // d.minDFA();
                         System.out.println("................................");
@@ -102,7 +104,7 @@ public class RegEx {
                         if (isRegex(regEx)) {
                             // la methode est plus rapide
                             System.out.println("....ELSE.....");
-                            ArrayList<ArrayList<Integer>> result = mainM1(lines, d);
+                            ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
                             printWordsInColorM1(lines, result, BEG, END);
                         }
                     } else {
@@ -147,7 +149,7 @@ public class RegEx {
         }
     }
 
-    public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d) {
+    public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d, String regEx) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
         Search search = new Search();
 
@@ -156,7 +158,7 @@ public class RegEx {
             i++;
             // System.err.println("line : " + line);
 
-            ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, i, 0);
+            ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, regEx, i, 0);
             if (matching.size() > 0)
                 result.addAll(matching);
         }
@@ -257,13 +259,12 @@ public class RegEx {
 
             if (END)
                 line = line.replace("$", "");
-
             System.out.println(
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                             RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
                             ANSI_RESET +
-                            (line.length() > ti.get(i).get(2) ? line.substring(ti.get(i).get(2), line.length()) : ""));
+                            (line.length() > (ti.get(i).get(2)-1) ? line.substring(ti.get(i).get(2)-1, line.length()) : ""));
         }
     }
 
@@ -301,7 +302,7 @@ public class RegEx {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 // System.out.println("line: " + line);
-                search.searchWithDFA(d, line, 0, 0);
+                search.searchWithDFA(d, line, regEx, 0, 0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -310,7 +311,7 @@ public class RegEx {
 
     private static boolean isRegex(String str) {
         return ((!str.equals("")) && (str != null) && (str.contains(".") || str.contains("*") || str.contains("|")
-                || str.contains("(") || str.contains(")") || str.contains("^") || str.contains("$") || str.contains("\\n")));
+                || str.contains("(") || str.contains(")") || str.contains("^") || str.contains("?") || str.contains("$") || str.contains("\\n")));
     }
 
     // FROM REGEX TO SYNTAX TREE
@@ -346,6 +347,8 @@ public class RegEx {
             return (int) c;
         if (c == '.')
             return DOT;
+        if (c == '?')
+            return POINTINTERROGATION;
         if (c == '*')
             return ETOILE;
         if (c == '|')
@@ -915,6 +918,8 @@ class RegExTree {
             return "|";
         if (root == RegEx.DOT)
             return ".";
+        if (root == RegEx.POINTINTERROGATION)
+            return "?";
         return Character.toString((char) root);
     }
 
