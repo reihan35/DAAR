@@ -146,15 +146,16 @@ public class RegEx {
                     // n.print();
                     DFA d = n.to_DFA();
                     d.print();
-                    System.out.println("................................");
                     // d.minDFA();
-                    System.out.println("................................");
 
                     if (isRegex(regEx)) {
+
                         // la methode est plus rapide
                         System.out.println("....ELSE.....");
-                        ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
-                        printWordsInColorM1(linesOrigin, result, BEG, END);
+                        HashMap<Integer, ArrayList<ArrayList<Integer>>> result = mainM1(lines, d, regEx);
+                        if(c)
+                            return;
+                        printWordsInColorM1(linesOrigin, result);
                     }
                 } else {
                     // method 3
@@ -198,23 +199,29 @@ public class RegEx {
 
     }
 
-    public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d, String regEx) {
+    public static HashMap<Integer, ArrayList<ArrayList<Integer>>> mainM1(ArrayList<String> lines, DFA d, String regEx) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
         Search search = new Search();
 
+        HashMap<Integer, ArrayList<ArrayList<Integer>>> matchingWordId = new HashMap<Integer, ArrayList<ArrayList<Integer>>>();
+
+
         int i = 0;
-        int nbLineMatch = 0;
+        int nbWordsMatch = 0;
+        int nbLinesMatch = 0;
 
         for (String line : lines) {
             i++;
 
-
             ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, regEx, i, 0);
-            if (matching.size() > 0)
-                result.addAll(matching);
-            nbLineMatch++;
+
+            matchingWordId.computeIfAbsent(i, k -> new ArrayList<>()).addAll((matching));
+
+            nbWordsMatch += matching.size();
         }
-        return result;
+        System.err.println("Nombre de motif trouver " + RED + nbWordsMatch);
+
+        return matchingWordId;
     }
 
     public static ArrayList<ArrayList<Integer>> mainKMP(ArrayList<String> lines, boolean c) {
@@ -255,8 +262,7 @@ public class RegEx {
         }
     }
 
-    public static void printWordsInColor(String
-                                                 reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+    public static void printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
@@ -281,8 +287,7 @@ public class RegEx {
         }
     }
 
-    public static void printWordsInColorKMP(String
-                                                    reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
+    public static void printWordsInColorKMP(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
@@ -294,32 +299,36 @@ public class RegEx {
                     RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
                     ANSI_RESET +
-                    (ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length() - 1) : ""))
-            ;
+                    (ti.get(i).get(1) + reg.length() < line.length() ? line.substring(ti.get(i).get(1) + reg.length() - 1, line.length() - 1) : ""));
 
         }
     }
 
 
-    public static void printWordsInColorM1
-            (ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti, boolean BEG, boolean END) {
+    public static void printWordsInColorM1(ArrayList<String> lines, HashMap<Integer, ArrayList<ArrayList<Integer>>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
 
-        System.out.println( "ti : " + ti);
+        System.out.println("ti : " + ti);
 
-        for (int i = 0; i < ti.size(); i++) {
+        for (int i : ti.keySet()) {
             if (m && i == mNB)
                 break;
-            String line = lines.get(ti.get(i).get(0) - 1);
 
-            System.out.println( i+ " " +
-                    (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                            RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
-                            ANSI_RESET +
-                            (line.length() > (ti.get(i).get(2) - 1) ? line.substring(ti.get(i).get(2) - 1, line.length()) : ""));
+            for (ArrayList<Integer> colonne : ti.get(i)) {
+
+                String line = lines.get(i-1);
+
+                System.out.println((colonne.get(0) > 1 ? line.substring(0, colonne.get(0) - 1) : "") +
+                        RED +
+                        line.substring(colonne.get(0) - 1, colonne.get(1) - 1) +
+                        ANSI_RESET +
+                        (line.length() > (colonne.get(1) - 1) ? line.substring(colonne.get(1) - 1, line.length()) : ""));
+            }
         }
+    }
+    public static void printLine(){
+
     }
 
     public static ArrayList<String> getLinesFiles(String file) throws
@@ -335,7 +344,7 @@ public class RegEx {
 
                 lines.add(line);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return lines;
