@@ -22,13 +22,11 @@ public class RegEx {
     static final int DOT = 0xD07;
     static final int POINTINTERROGATION = 0xF07;
 
-
     static final String RED = "\033[0;31m"; // RED
     public static final String GREEN = "\033[0;32m";   // GREEN
     public static final String BLUE_BOLD = "\033[1;34m";   // BLUE
     public static final String RESET = "\033[0m";  // Text Reset
     public static final String PURPLE_BOLD = "\033[1;35m"; // PURPLE
-
 
     // REGEX
     public static String regEx;
@@ -92,10 +90,10 @@ public class RegEx {
             // OK option c: Supprimer la sortie normale; à la place, imprimez le nombre de ligne de correspondantes
             if (option.contains("c"))
                 c = true;
+
             if (option.contains("m")) {
                 m = true;
                 String[] options = option.split("m");
-                // System.err.println("  m nb 0 : " + options[0]);
                 mNB = Integer.parseInt(options[1]);
             }
 
@@ -152,10 +150,12 @@ public class RegEx {
 
                         // la methode est plus rapide
                         System.out.println("....ELSE.....");
-                        HashMap<Integer, ArrayList<ArrayList<Integer>>> result = mainM1(lines, d, regEx);
+                        ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
+                        System.out.println("....ELSE....." + result.size());
+
                         if(c)
                             return;
-                        printWordsInColorM1(linesOrigin, result);
+                        printWordsInColorM1(lines, result, BEG, END);
                     }
                 } else {
                     // method 3
@@ -199,29 +199,25 @@ public class RegEx {
 
     }
 
-    public static HashMap<Integer, ArrayList<ArrayList<Integer>>> mainM1(ArrayList<String> lines, DFA d, String regEx) {
+    public static ArrayList<ArrayList<Integer>> mainM1(ArrayList<String> lines, DFA d, String regEx) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
         Search search = new Search();
 
-        HashMap<Integer, ArrayList<ArrayList<Integer>>> matchingWordId = new HashMap<Integer, ArrayList<ArrayList<Integer>>>();
-
-
         int i = 0;
         int nbWordsMatch = 0;
-        int nbLinesMatch = 0;
 
         for (String line : lines) {
             i++;
 
             ArrayList<ArrayList<Integer>> matching = search.searchWithDFA(d, line, regEx, i, 0);
-
-            matchingWordId.computeIfAbsent(i, k -> new ArrayList<>()).addAll((matching));
+            if (matching.size() > 0)
+                result.addAll(matching);
 
             nbWordsMatch += matching.size();
         }
-        System.err.println("Nombre de motif trouver " + RED + nbWordsMatch);
-
-        return matchingWordId;
+        if(c)
+            System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
+        return result;
     }
 
     public static ArrayList<ArrayList<Integer>> mainKMP(ArrayList<String> lines, boolean c) {
@@ -305,30 +301,30 @@ public class RegEx {
     }
 
 
-    public static void printWordsInColorM1(ArrayList<String> lines, HashMap<Integer, ArrayList<ArrayList<Integer>>> ti) {
+    public static void printWordsInColorM1(ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti, boolean BEG, boolean END) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
-
-        System.out.println("ti : " + ti);
-
-        for (int i : ti.keySet()) {
-            if (m && i == mNB)
-                break;
-
-            for (ArrayList<Integer> colonne : ti.get(i)) {
-
-                String line = lines.get(i-1);
-
-                System.out.println((colonne.get(0) > 1 ? line.substring(0, colonne.get(0) - 1) : "") +
-                        RED +
-                        line.substring(colonne.get(0) - 1, colonne.get(1) - 1) +
-                        ANSI_RESET +
-                        (line.length() > (colonne.get(1) - 1) ? line.substring(colonne.get(1) - 1, line.length()) : ""));
+        for (int i = 0; i < ti.size(); i++) {
+            if(m){
+                if(i==mNB)
+                    break;
             }
-        }
-    }
-    public static void printLine(){
 
+            String line = lines.get(ti.get(i).get(0) - 1);
+
+            if (BEG)
+                line = line.replace("^", "");
+
+            if (END)
+                line = line.replace("$", "");
+
+            System.out.println(
+                    (((ti.get(i).get(1) > 1) && !o) ? line.substring(0, ti.get(i).get(1) - 1) : "") +
+                            RED +
+                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
+                            ANSI_RESET +
+                            ((line.length() > (ti.get(i).get(2)-1) && !o) ? line.substring(ti.get(i).get(2)-1, line.length()) : ""));
+        }
     }
 
     public static ArrayList<String> getLinesFiles(String file) throws

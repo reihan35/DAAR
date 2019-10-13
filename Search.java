@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Exception;
@@ -19,73 +20,97 @@ public class Search {
         ArrayList<Integer> nextState = null;
         String currentChar = "";
         String maxMatching = "";
-        HashMap<Integer, ArrayList<ArrayList<Integer>>> matchingWordId = new HashMap<Integer, ArrayList<ArrayList<Integer>>>();
+        HashMap<String, ArrayList<ArrayList<Integer>>> matchingWordId = new HashMap<String, ArrayList<ArrayList<Integer>>>();
 
         boolean change = false;
+        // System.out.println("0 je suis la !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        // System.out.println("........ text : " + txt);
         int idxCharFirstRep = -1;
 
         int BEG = 0;
         if (regEx.substring(0, 1).contains("^"))
             BEG = 1;
+        // System.out.println("........ BEG : " + BEG);
 
         int END = 0;
         if (regEx.substring(regEx.length() - 1, regEx.length()).contains("$"))
             END = 1;
+        // System.out.println("........ END : " + END);
+
 
         for (ArrayList<Integer> state : dfa.q0) {
             currentChar = "";
 
             for (int i = 0; i < N; i++) {
+                // System.out.println(i + " | " + txt.charAt(i) + "..............................................................");
                 if (dfa.Transitions.containsKey(state)) {
 
                     if (dfa.Transitions.get(state).keySet().contains(DOT)) {
+                        // System.out.println(" 0 >>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DOT" );
                         currentState = dfa.Transitions.get(state).get(DOT);
                     } else {
                         currentState = dfa.Transitions.get(state).get((int) txt.charAt(i));
                     }
 
+                    // System.out.println("$$ i : " + txt.charAt(i));
+                    // System.out.println("$$ currentState: " + currentState);
                     if (currentState == null) {
+                        // System.out.println("     curr keySet() : " + dfa.Transitions.get(state).keySet());
+                        // System.out.println("     curr : " + dfa.Transitions.get(state));
                         Set<Integer> IdTransition = dfa.Transitions.get(state).keySet();
                         ArrayList<Integer> IdTransitionList = new ArrayList<Integer>(IdTransition);
                         currentState = dfa.Transitions.get(state).get(IdTransitionList.get(0));
                         if (dfa.Transitions.get(currentState).keySet().contains(POINTINTERROGATION)) {
+                            // System.out.println("        POINTINTERROGATION");
                             currentState = dfa.Transitions.get(currentState).get(POINTINTERROGATION);
+                            // System.out.println("    2 APRES $$ currentState: " + currentState);
                             POINTINTERROGATIONB = false;
+                            // System.out.println(" * txt: " + txt.charAt(i));
                             currentState = dfa.Transitions.get(currentState).get((int) txt.charAt(i));
                         } else {
                             currentState = null;
                         }
                     }
-                    if (currentState != null) {
+
+                    // System.out.println("    APRES $$ currentState: " + currentState);
+                    if (currentState != null && i<N-1) {
+                        if(i>N-1)
+                            break;
                         nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
+                        // System.out.println(" 2 >>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DOT" );
 
                         if (dfa.Transitions.get(currentState).keySet().contains(DOT) && nextState == null) {
+                            // System.out.println(" 1 >>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DOT" );
                             nextState = dfa.Transitions.get(currentState).get(DOT);
                         } else if (i < N - 1) {
                             if (dfa.Transitions.get(currentState).keySet().contains(POINTINTERROGATION)) {
                                 currentState = dfa.Transitions.get(currentState).get(POINTINTERROGATION);
+                                // System.out.println("    POINTINTERROGATION nextState  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                             }
                             nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
                         }
 
+
+                        // System.out.println("		 nextState: " + nextState);
                         currentChar = currentChar + txt.charAt(i);
+                        // System.out.println("    currentChar: " + currentChar);
 
                         if (dfa.f.contains(currentState) && nextState == null) {
+                            // System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++");
+                            // System.out.println(" nextState: " + currentState);
 
                             currentChar = currentChar + txt.charAt(i);
+                            // System.out.println(" >>>> currentChar : " + currentChar);
 
                             ArrayList<Integer> elem = new ArrayList<>();
                             elem.add(idLine);
-                            elem.add(i + 1);
-                            elem.add(i + currentChar.length() + 1 - BEG - END); // fin
-                            resutls.add(currentChar);
-
-                            elem = new ArrayList<>();
+                            //elem.add(i - currentChar.length() + 2); // deb
                             elem.add(i + 1);
                             elem.add(i + currentChar.length() + 1 - BEG - END); // fin
                             resutlsF.add(elem);
+                            resutls.add(currentChar);
 
-                            matchingWordId.computeIfAbsent(idLine, k -> new ArrayList<>()).add((elem));
+                            matchingWordId.computeIfAbsent(currentChar, k -> new ArrayList<>()).add((elem));
 
                             change = false;
                             if (maxMatching.length() < currentChar.length())
@@ -96,6 +121,7 @@ public class Search {
                             if (!dfa.f.contains(currentState)) {
 
                                 currentChar = currentChar + txt.charAt(i + 1);
+                                // System.out.println(" 0 next txt: " + txt.charAt(i + 1));
                                 // System.out.println(" 0 currentChar : " + currentChar);
                                 change = false;
                                 // currentState = nextState;
@@ -127,8 +153,6 @@ public class Search {
                                     // System.out.println(" AVANT currentState : " + currentState);
                                     // System.out.println(" 0 je suis la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" +
                                     //  dfa.Transitions.get(currentState));
-
-
 
 
                                     // System.out.println(" * je suis la 1 " );
@@ -170,7 +194,7 @@ public class Search {
                                                     nextState = dfa.Transitions.get(currentState).get((int) txt.charAt(i + 1));
                                                     // System.out.println("    ** 2 APRES $$ nextState: " + nextState);
                                                     POINTINTERROGATIONB = false;
-                                                    System.out.println("	kkkkkkk  curr txt: " + txt.charAt(i));
+                                                    // System.out.println("	kkkkkkk  curr txt: " + txt.charAt(i));
                                                 } else {
                                                     nextState = null;
                                                 }
@@ -293,14 +317,9 @@ public class Search {
                                         elem.add(i + 1);
                                         elem.add(i + currentChar.length() + 1 - BEG - END);
 
-                                        resutls.add(currentChar);
-
-                                        elem = new ArrayList<>();
-                                        elem.add(i + 1);
-                                        elem.add(i + currentChar.length() + 1 - BEG - END); // fin
                                         resutlsF.add(elem);
-
-                                        matchingWordId.computeIfAbsent(idLine, k -> new ArrayList<>()).add((elem));
+                                        resutls.add(currentChar);
+                                        matchingWordId.computeIfAbsent(currentChar, k -> new ArrayList<>()).add((elem));
 
                                         currentChar = "";
                                         change = false;
@@ -308,7 +327,7 @@ public class Search {
                                             maxMatching = currentChar;
                                     } else {
                                         // System.out.println(" je ne suis pas accepté : " + currentChar + " | " +
-                                           //      currentState);
+                                        //      currentState);
                                         // System.out.println("     curr : " + dfa.Transitions.get(currentState));
                                     }
                                     currentChar = "";
@@ -322,14 +341,9 @@ public class Search {
                                 // 1 pour commencer de 1 et non de 0
                                 elem.add(i + 1);
                                 elem.add(i + currentChar.length() + 1 - BEG - END);
-                                resutls.add(currentChar);
-
-                                elem = new ArrayList<>();
-                                elem.add(i + 1);
-                                elem.add(i + currentChar.length() + 1 - BEG - END);
                                 resutlsF.add(elem);
-
-                                matchingWordId.computeIfAbsent(idLine, k -> new ArrayList<>()).add((elem));
+                                resutls.add(currentChar);
+                                matchingWordId.computeIfAbsent(currentChar, k -> new ArrayList<>()).add((elem));
 
                                 change = false;
                                 if (maxMatching.length() < currentChar.length())
@@ -338,12 +352,19 @@ public class Search {
                             }
                         } else {
                             currentChar = "";
+                            // System.out.println("sinon RIEN");
                         }
                     }
                     currentChar = "";
+                    // System.out.println("je suis mammmmm: ");
                 }
             }
         }
+        /*
+         * if (resutls.size() != 0) { System.out.println("results: " + resutls);
+         * System.out.println("maxMatching in this line (texte): " + maxMatching); }
+         */
+        // System.out.println(">>> resutls : " + resutlsF);
         return resutlsF;
     }
 
