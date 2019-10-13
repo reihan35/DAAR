@@ -8,7 +8,7 @@ import java.io.*;
 import java.time.*;
 
 // java RegEx '`S(a|r|g)*on`' text1
-
+//FICHIER DE TESTE POUR LES AUTOMATES
 public class testeReg {
     // MACROS
     static final int CONCAT = 0xC04CA7;
