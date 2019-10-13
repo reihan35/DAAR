@@ -43,7 +43,11 @@ public class testeReg {
             }
             return;
         } else {*/
+<<<<<<< HEAD
             generateFiles(1500 );
+=======
+            generateFiles(3);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
             folderName = arg[0];
             boolean allChar = false;
             final File folder = new File(folderName);
@@ -52,23 +56,38 @@ public class testeReg {
                 for (final File file : folder1.listFiles()) {
                     boolean BEG = false;
                     boolean END = false;
+<<<<<<< HEAD
                     // System.out.println(file.getName());
                     Random r = new Random();
                     String regEx = generateRegex();
                     // System.out.println(regEx);
+=======
+                    System.out.println(file.getName());
+                    Random r = new Random();
+                    String regEx = generateRegex();
+                    System.out.println(regEx);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                     //egrep 
                     //System.out.println("egrep");
                     //System.out.println("path :" + folderName + file.getName());
                     writer.write(file.getName()+ " "); //LE NOM DU FICHIER
                     writer.write(regEx + " ");
                     String c2 = "egrep " + "-c " + regEx +" "+ folderName + folder1.getName()+ "/" + file.getName();
+<<<<<<< HEAD
                     // System.out.println(c2);
+=======
+                    System.out.println(c2);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                     final Process process2 = Runtime.getRuntime().exec(c2);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process2.getInputStream()));
                         String line = "";
                         try {
                             while((line = reader.readLine()) != null) {
+<<<<<<< HEAD
                        //         System.out.println("je rentre");
+=======
+                                System.out.println("je rentre");
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                                 writer.write(line + " "); //LE NBR MOT AVEC EGREP
                             }
                         } finally {
@@ -77,19 +96,34 @@ public class testeReg {
 
                     String c = "egrep " + regEx +" "+ folderName + folder1.getName()+ "/" + file.getName();
                     Instant start = Instant.now();
+<<<<<<< HEAD
                     final Process process = Runtime.getRuntime().exec(c2);
                     Instant finish = Instant.now();
                     long timeElapsed = Duration.between(start, finish).toNanos(); 
                     // System.out.println(timeElapsed);
+=======
+                    final Process process = Runtime.getRuntime().exec(c);
+                    Instant finish = Instant.now();
+                    long timeElapsed = Duration.between(start, finish).toNanos(); 
+                    System.out.println(timeElapsed);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                     
                     writer.write(timeElapsed + " "); //LE TEMPS AVEC EGREP
                     
                    if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
+<<<<<<< HEAD
                         //System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
                         regEx = regEx.substring(1, regEx.length() - 1);
                         allChar = true;
                     }
                     // System.out.println("1 regEx : " + regEx);
+=======
+                        System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
+                        regEx = regEx.substring(1, regEx.length() - 1);
+                        allChar = true;
+                    }
+                    System.out.println("1 regEx : " + regEx);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
 
 
                     if (regEx.length() < 1) {
@@ -109,6 +143,7 @@ public class testeReg {
                              ArrayList<String> lines = getLinesFiles( folderName + folder1.getName()+ "/" + file.getName(), BEG, END);
 
                             if (isRegex(regEx)) {
+<<<<<<< HEAD
                                 // System.out.println("....Method1.....");
                                 // System.out.println("!!!!!!!!!!!!!!!!!!");
                                 RegExTree ret = parse(regEx,allChar);
@@ -123,12 +158,32 @@ public class testeReg {
                                 if (isRegex(regEx)) {
                                     // la methode est plus rapide
                                    // System.out.println("....ELSE.....");
+=======
+                                System.out.println("....Method1.....");
+                                System.out.println("!!!!!!!!!!!!!!!!!!");
+                                RegExTree ret = parse(regEx,allChar);
+                                NFA n = ret.toAutomaton();
+                                n.print();
+                                DFA d = n.to_DFA();
+                                // d.print();
+                                System.out.println("................................");
+                                // d.minDFA();
+                                System.out.println("................................");
+
+                                if (isRegex(regEx)) {
+                                    // la methode est plus rapide
+                                    System.out.println("....ELSE.....");
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                                     start = Instant.now();
                                     ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
                                     finish = Instant.now();
                                     timeElapsed = Duration.between(start, finish).toNanos(); 
                                     writer.write(timeElapsed + " ");
+<<<<<<< HEAD
                                     // printWordsInColorM1(lines, result, BEG, END);
+=======
+                                    printWordsInColorM1(lines, result, BEG, END);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                                     writer.write("\n");
                                 }
                             }
@@ -178,18 +233,30 @@ public class testeReg {
             if(taille == 10000){
                 s = "fichier10K";
                 for(int i = 0 ; i< nbr;i++){
+<<<<<<< HEAD
                     // System.out.println("ALO");
+=======
+                    System.out.println("ALO");
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                     generateFileEnglish(taille,s + (i+1),f10);
                     //System.out.println(i);
                 }
             }
             else{
                 if(taille == 100000){
+<<<<<<< HEAD
                     // System.out.println("ALO");
 
                     s = "fichier100K";
                     for(int i = 0 ; i< nbr;i++){
                        //  System.out.println("ALO");
+=======
+                    System.out.println("ALO");
+
+                    s = "fichier100K";
+                    for(int i = 0 ; i< nbr;i++){
+                        System.out.println("ALO");
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                         generateFileEnglish(taille,s + (i+1),f2);
                         //System.out.println(i);
                     }
@@ -331,7 +398,11 @@ public class testeReg {
         alphabet.add('z');
         int cpt = 0;
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, fileName)));
+<<<<<<< HEAD
         // System.out.println(writer);
+=======
+        System.out.println(writer);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
         while(cpt < taille){
             Random r = new Random();
             int low = 3;
@@ -367,7 +438,11 @@ public class testeReg {
             if (matching.size() > 0)
                 result.addAll(matching);
         }
+<<<<<<< HEAD
         // System.out.println("[M1] word match: " + result);
+=======
+        System.out.println("[M1] word match: " + result);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
         return result;
     }
 
@@ -384,7 +459,11 @@ public class testeReg {
             if (matching.size() > 0)
                 result.addAll(matching);
         }
+<<<<<<< HEAD
         // System.out.println(">>>>>>>>>> result: " + result.size());
+=======
+        System.out.println(">>>>>>>>>> result: " + result.size());
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
 
         return result;
     }
@@ -474,8 +553,13 @@ public class testeReg {
     }
 
     public static ArrayList<String> getLinesFiles(String file, boolean BEG, boolean END) throws FileNotFoundException {
+<<<<<<< HEAD
         //System.out.println(" BEG LINES : " + BEG);
         //System.out.println(" END LINES : " + END);
+=======
+        System.out.println(" BEG LINES : " + BEG);
+        System.out.println(" END LINES : " + END);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
         ArrayList<String> lines = new ArrayList<String>();
         try {
             int i = 0;
@@ -534,7 +618,11 @@ public class testeReg {
             boolean ignore = false;
 
             if (regEx.charAt(i) == '\\') {
+<<<<<<< HEAD
           //      System.out.println(">>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! .......................");
+=======
+                System.out.println(">>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! .......................");
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
                 ignore = true;
                 i++;
             }
@@ -902,7 +990,11 @@ class NFA {
                 Sigma.add(i);
             }
         }
+<<<<<<< HEAD
         // print_transitions();
+=======
+        print_transitions();
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
         set_transitions(0, r1, q0);
         set_transitions(0, r1, A2.q0);
         set_transitions(0, f, r2);
@@ -990,7 +1082,11 @@ class NFA {
         ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
         new_states.add(eclosures);
+<<<<<<< HEAD
         // System.out.println(eclosures);
+=======
+        System.out.println(eclosures);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
         Q.add(eclosures);
         while (new_states.size() > 0) {
             for (int j : Sigma) {
@@ -1024,7 +1120,11 @@ class NFA {
                 }
             }
             new_states.remove(0); // On marque l'état d'avant comme deja lu
+<<<<<<< HEAD
            // System.out.println(new_states);
+=======
+            System.out.println(new_states);
+>>>>>>> bee1b6280a2861a1812acfa7f6a6f682c41c2ea9
 
         }
 
