@@ -80,7 +80,7 @@ public class RegEx {
             if (option.contains("h")) {
                 System.err.println("Commande RegEx [OPTIONS] PATTERN [FILE]");
                 System.err.println("Les options : ");
-                System.err.println("-l: affiche le nom du fichier");
+                System.err.println("-l : affiche le nom du fichier");
                 System.err.println("-i : Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée");
                 System.err.println("-w : Sélectionnez uniquement les lignes contenant des correspondances qui forment des mots entiers.");
                 System.err.println("-c : Supprimer la sortie normale; à la place, imprimez un nombre de mots correspondantes pour chaque fichier d'entrée. (nb mots trouver)");
@@ -329,7 +329,7 @@ public class RegEx {
 
             nbWordsMatch += ti.get(i).size();
 
-            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") +
+            System.out.println((n ? BLUE_BOLD + index + ":" + RESET : "") +
                     ANSI_RESET +
                     line.substring(0, index - 1) +
                     RED +
@@ -359,7 +359,7 @@ public class RegEx {
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") + ANSI_RESET +
+            System.out.println((n ? BLUE_BOLD + ti.get(i).get(0) + ":" + RESET : "") + ANSI_RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                     RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
@@ -387,7 +387,7 @@ public class RegEx {
             if (END)
                 line = line.replace("$", "");
 
-            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") +
+            System.out.println((n ? BLUE_BOLD + ti.get(i).get(0) + ":" + RESET : "") +
                     (((ti.get(i).get(1) > 1) && !o) ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                     RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
