@@ -179,14 +179,20 @@ public class RegEx {
 
                             Trie t = Indexing.trieFromFile(cache);
                             // System.out.println(t.search(regEx));
+                            if(c || y)
+                                return;
                             printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
                         } else {
                             // KMP (method 2)
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
+                            if(c || y)
+                                return;
                             printWordsInColorKMP(regEx, lines, result);
                         }
                     } else {
                         ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
+                        if(c || y)
+                            return;
                         printWordsInColorKMP(regEx, lines, result);
                     }
                 }
@@ -229,6 +235,8 @@ public class RegEx {
         Search search = new Search();
         int[] retenue = search.retenue(regEx);
         int nbLineMatch = 0;
+        int nbWordsMatch = 0;
+
 
         int i = 0;
         for (String line : lines) {
@@ -238,8 +246,18 @@ public class RegEx {
 
             if (matching.size() > 0)
                 result.addAll(matching);
+            nbWordsMatch += matching.size();
             nbLineMatch++;
         }
+
+
+        if(c)
+            System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
+
+        if(y)
+            System.out.println("Nombre de ligne où un motif à été trouver : " + RED + nbLineMatch + RESET);
+
+
         return result;
 
     }
@@ -268,6 +286,10 @@ public class RegEx {
     public static void printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
+
+        int nbLineMatch = 0;
+        int nbWordsMatch = 0;
+
         for (int i = 0; i < ti.size(); i++) {
             Object lineNumt = ti.get(i).get(0);
             String s = (String) lineNumt;
@@ -278,13 +300,22 @@ public class RegEx {
             int index = Integer.parseInt(s2);
             String line = lines.get(lineNum - 1);
 
-            System.out.println(
+            nbWordsMatch += ti.get(i).size();
+
+            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") +
                     ANSI_RESET +
                             line.substring(0, index - 1) +
-                            ANSI_RED +
+                            RED +
                             (index > 0 ? line.substring(index - 1, index + reg.length() - 1) : "")
                             + ANSI_RESET +
                             ((index + reg.length() - 1) > line.length() ? line.substring(index + reg.length() - 1, line.length()) : ""));
+
+            if(c)
+                System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
+
+            if(y)
+                System.out.println("Nombre de ligne où un motif à été trouver : " + RED + ti.size() + RESET);
+
 
         }
     }
@@ -297,7 +328,7 @@ public class RegEx {
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-            System.out.println(ANSI_RESET +
+            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") + ANSI_RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                     RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
