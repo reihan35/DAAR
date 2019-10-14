@@ -2,7 +2,7 @@
 
 * Exemple d'utilisation
 
-Dans l'exemple 1 on cherche une expression régulier dans un fichier.\\
+Dans l'exemple 1 on cherche une expression régulier dans un fichier.
 ![alt text](resultsRapport/exemple1.png)
 
 Dans l'exemple 2 on cherche une expression régulier "hel" suivi d'un caractère et qui se trouve a la fin de la ligne dans un fichier.
@@ -15,7 +15,7 @@ Egrep implementer s'utilise de la manière suivant :
 RegEx
 
 * Commande :
-RegEx [ OPTIONS ] PATTERN [ FILE ]
+java RegEx [ OPTIONS ] PATTERN [ FILE ]
 
 * Description :
 Notre programme recherche dans l'entrée du nom FILE les lignes contenant un match avec le PATTERN entrée. Par défaut, il va affiche les lignes correspondantes.
@@ -34,11 +34,11 @@ Notre programme recherche dans l'entrée du nom FILE les lignes contenant un mat
 
 * Caractère spécial accepté :
 \textasciicircum : PATTERN rechercher est au début de la ligne.
-\$: PATTERN rechercher se trouve à la fin de la ligne.
-$*$: L'élément précédent sera apparié zéro ou plusieurs fois.
-$|$: Soit L'élément précédent ou L'élément suivant de $\vert$ doit être présent.
-$($ $)$: L'opérateur qui suit ce caractère sera appliqué à tout ce qui a entre parentes.
+$: PATTERN rechercher se trouve à la fin de la ligne.
+*: L'élément précédent sera apparié zéro ou plusieurs fois.
+|: Soit L'élément précédent ou L'élément suivant de "|" doit être présent.
+( & ): L'opérateur qui suit ce caractère sera appliqué à tout ce qui a entre parentes.
 ?: L'élément précédent est facultatif et correspond au maximum une fois. (cependant la recherche avec ce caractère peut ne pas fonctionne, des erreurs sont malheureusement encore présente)
 
 * Expressions régulières basiques
-Dans les expressions rationnelles de base, les méta-caractères ~ . , $*$ , $|$ , $($ , $)$ et ? perdent leur signification particulière; utilisez plutôt les versions anti-slashées $\backslash.$ , $\backslash*$, $\backslash|$ , $\backslash($ , $\backslash)$ et $\backslash?$ ou utilisez le PATTERN avec `[PATTERN]`.
+Dans les expressions rationnelles de base, les méta-caractères . , * , | , ( , ) et ? perdent leur signification particulière; utilisez plutôt les versions anti-slashées \. , \*, \| , \( , \) et \? ou utilisez le PATTERN avec `[PATTERN]`.
