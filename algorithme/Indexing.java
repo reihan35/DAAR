@@ -72,7 +72,6 @@ public class Indexing {
          * Cette fonction ordonne les élements d'une hashmap en fonction de leur valeur
          *
          * hm : hashmap<mots, occurence>
-         *
          */
 
         // Faire une liste à partir des element du hashmap
@@ -246,8 +245,13 @@ public class Indexing {
 
 }
 
-//Cette classe corespond à chaquqe noeud de notre trie
+
 class TrieNode {
+    /**
+     *Cette classe corespond à chaquqe noeud de notre trie
+     *
+     */
+
     private Character c;
     private HashMap<Character, TrieNode> children = new HashMap<>();
     private ArrayList<ArrayList<Integer>> wordOccurences; //L'occurences du mot dans le texte si null c'est que noeud ne correspond pas à fin de mot
@@ -283,6 +287,9 @@ class TrieNode {
 }
 
 class Trie {
+    /**
+     * Structure de notre arbre
+     */
 
     private TrieNode root;
 
