@@ -9,10 +9,10 @@ import java.time.*;
 
 public class DFA {
     /**
-     * Class représentant l'automat déterministe
+     * Class représentant les automates finie deterministe
      *  contient les méthodes suivant:
      *          minimization du DFA: qui conserne l'étape 4
-     *          print: pour afficher l'automate 
+     *          print: pour afficher l'automate
      */
     protected ArrayList<ArrayList<Integer>> q = new ArrayList<ArrayList<Integer>>();
     protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
@@ -29,7 +29,6 @@ public class DFA {
         this.f = F;
         this.Transitions = Transitions;
     }
-    //Class pour les automates finie deterministe
 
     public void minDFA() {
         /**
