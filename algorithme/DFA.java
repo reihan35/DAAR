@@ -8,6 +8,12 @@ import java.io.*;
 import java.time.*;
 
 public class DFA {
+    /**
+     * Class représentant l'automat déterministe
+     *  contient les méthodes suivant:
+     *          minimization du DFA: qui conserne l'étape 4
+     *          print: pour afficher l'automate 
+     */
     protected ArrayList<ArrayList<Integer>> q = new ArrayList<ArrayList<Integer>>();
     protected ArrayList<Integer> Sigma = new ArrayList<Integer>();
     protected ArrayList<ArrayList<Integer>> q0;

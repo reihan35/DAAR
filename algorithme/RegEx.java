@@ -10,6 +10,11 @@ import java.time.*;
 // java RegEx '`S(a|r|g)*on`' text1
 
 public class RegEx {
+    /**
+     * Class qui comporte
+     *      le main et les différents méthodes pour lancement des trois méthodes
+     *      le parser fourni, modifier pour traiter les caractère
+     */
 
     // MACROS
     public static final int CONCAT = 0xC04CA7;
