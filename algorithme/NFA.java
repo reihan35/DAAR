@@ -126,7 +126,7 @@ class NFA {
                 Sigma.add(i);
             }
         }
-        print_transitions();
+        // print_transitions();
         set_transitions(0, r1, q0);
         set_transitions(0, r1, A2.q0);
         set_transitions(0, f, r2);
@@ -218,7 +218,7 @@ class NFA {
         ArrayList<ArrayList<Integer>> fi = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<Integer>> Q = new ArrayList<ArrayList<Integer>>();
         new_states.add(eclosures);
-        System.out.println(eclosures);
+        // System.out.println(eclosures);
         Q.add(eclosures);
         while (new_states.size() > 0) {
             for (int j : Sigma) {
@@ -252,7 +252,7 @@ class NFA {
                 }
             }
             new_states.remove(0); // On marque l'état d'avant comme deja lu
-            System.out.println(new_states);
+            // System.out.println(new_states);
 
         }
 
