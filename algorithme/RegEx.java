@@ -57,7 +57,7 @@ public class RegEx {
             fileName = arg[1];
             System.out.println(" >> regEx : " + regEx);
             System.out.println(" >> file name : " + fileName);
-            
+
         } else if (arg.length == 3) {
             // RegEx [OPTIONS] PATTERN [FILE]
             option = arg[0];
@@ -135,7 +135,7 @@ public class RegEx {
                     RegExTree ret = parse(allChar);
                     NFA n = ret.toAutomaton();
                     DFA d = n.to_DFA();
-                    d.print();
+                    // d.print();
                     // d.minDFA();
 
                     if (isRegex(regEx)) {
@@ -158,11 +158,10 @@ public class RegEx {
                             }
 
                             Trie t = Indexing.trieFromFile(cache);
-                            System.out.println(t.search(regEx));
+                            // System.out.println(t.search(regEx));
                             printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
                         } else {
                             // KMP (method 2)
-                            System.out.println("....Method2.....");
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
                             printWordsInColorKMP(regEx, lines, result);
                         }
@@ -253,7 +252,6 @@ public class RegEx {
             s2 = s2.substring(1, s2.length());
             int index = Integer.parseInt(s2);
             String line = lines.get(lineNum - 1);
-            System.out.println(line);
 
             System.out.println(
                     ANSI_RESET +
