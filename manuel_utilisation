@@ -1,8 +1,12 @@
+Commande de lancement:
+    javac RegEx.java
+    java RegEx [OPTIONS] PATTERN [FILE]
+
+
 Pour chercher avec une expression conenant plusieur charchtère faut protéger la regEx avec  ` exemple : '`S(a|r|g)*on`'
 \ pour protéger un caracthère
 
-
-
+* -h : affiche les options
 
 * -1: -l: affiche le nom du fichier
 
@@ -19,5 +23,3 @@ Pour chercher avec une expression conenant plusieur charchtère faut protéger l
 * -o : print que les matching trouver
 
 * -n : affiche le numéro de ligne suivie de la sorti par defaut
-
-* -h : affiche les options

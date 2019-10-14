@@ -68,7 +68,7 @@ public class RegEx {
             System.out.println(" >> file name : " + fileName);
 
         } else if (arg.length == 3) {
-            // RegEx [OPTIONS] PATTERN [FILE]
+            // java RegEx [OPTIONS] PATTERN [FILE]
             option = arg[0];
             regEx = arg[1];
             fileName = arg[2];
@@ -78,7 +78,7 @@ public class RegEx {
 
             // option h: help
             if (option.contains("h")) {
-                System.err.println("Commande RegEx [OPTIONS] PATTERN [FILE]");
+                System.err.println("Commande: java RegEx [OPTIONS] PATTERN [FILE]");
                 System.err.println("Les options : ");
                 System.err.println("-l : affiche le nom du fichier");
                 System.err.println("-i : Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée");
