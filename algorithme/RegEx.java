@@ -32,6 +32,8 @@ public class RegEx {
     public static String regEx;
     public static String fileName;
     public static String option = null;
+
+    // OPTION
     public static boolean i = false;
     public static boolean w = false;
     public static boolean x = false;
@@ -71,7 +73,17 @@ public class RegEx {
 
             // option h: help
             if (option.contains("h")) {
-                System.err.println("Consulter le manuelle d'utilisation");
+                System.err.println("Commande RegEx [OPTIONS] PATTERN [FILE]");
+                System.err.println("Les options : ");
+                System.err.println("-l: affiche le nom du fichier");
+                System.err.println("-i : Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée");
+                System.err.println("-w : Sélectionnez uniquement les lignes contenant des correspondances qui forment des mots entiers.");
+                System.err.println("-c : Supprimer la sortie normale; à la place, imprimez un nombre de mots correspondantes pour chaque fichier d'entrée. (nb mots trouver)");
+                System.err.println("-y : Supprimer la sortie normale; à la place, imprimez un nombre de ligne correspondantes pour chaque fichier d'entrée. (nb ligne où y a des match)");
+                System.err.println("-m[n : nb ligne] : arrete l'affichage des linge matcher à la n-ème ligne");
+                System.err.println("-o : print que les matching trouver");
+                System.err.println("-n : affiche le numéro de ligne suivie de la sorti par defaut");
+                System.err.println("-h : affiche les options");
                 return;
             }
 
@@ -95,7 +107,11 @@ public class RegEx {
             if (option.contains("m")) {
                 m = true;
                 String[] options = option.split("m");
-                mNB = Integer.parseInt(options[1]);
+                try {
+                    mNB = Integer.parseInt(options[1]);
+                } catch (Exception e) {
+                    System.err.println("  Indecez un numbre après m : RegEx -m[n] [PATTEN] [FILE] ");
+                }
             }
 
             // option o : print que les matching trouver
@@ -159,14 +175,14 @@ public class RegEx {
 
                     if (isRegex(regEx)) {
                         ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
-                        if(c || y)
+                        if (c || y)
                             return;
 
                         printWordsInColorM1(lines, result, BEG, END);
                     }
                 } else {
                     if (w) {
-                        File cache = new File(fileName + "_cache" );
+                        File cache = new File(fileName + "_cache");
                         if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
                             // method 3
                             if (!cache.exists()) {
@@ -179,19 +195,19 @@ public class RegEx {
 
                             Trie t = Indexing.trieFromFile(cache);
                             // System.out.println(t.search(regEx));
-                            if(c || y)
+                            if (c || y)
                                 return;
                             printWordsInColor(regEx, FileToStrings(file), t.search(regEx));
                         } else {
                             // KMP (method 2)
                             ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
-                            if(c || y)
+                            if (c || y)
                                 return;
                             printWordsInColorKMP(regEx, lines, result);
                         }
                     } else {
                         ArrayList<ArrayList<Integer>> result = mainKMP(lines, c);
-                        if(c || y)
+                        if (c || y)
                             return;
                         printWordsInColorKMP(regEx, lines, result);
                     }
@@ -222,10 +238,10 @@ public class RegEx {
             nbWordsMatch += matching.size();
             nbLinessMatch++;
         }
-        if(c)
+        if (c)
             System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
 
-        if(y)
+        if (y)
             System.out.println("Nombre de ligne où un motif à été trouver : " + RED + nbLinessMatch + RESET);
         return result;
     }
@@ -251,10 +267,10 @@ public class RegEx {
         }
 
 
-        if(c)
+        if (c)
             System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
 
-        if(y)
+        if (y)
             System.out.println("Nombre de ligne où un motif à été trouver : " + RED + nbLineMatch + RESET);
 
 
@@ -282,6 +298,7 @@ public class RegEx {
             return null;
         }
     }
+
     //Cette fonction affiche les résultats de Radix Tree en coloriant les motifs retrouvés
     public static void printWordsInColor(String reg, ArrayList<String> lines, ArrayList<ArrayList<Integer>> ti) {
         String ANSI_RESET = "\u001B[0m";
@@ -291,6 +308,11 @@ public class RegEx {
         int nbWordsMatch = 0;
 
         for (int i = 0; i < ti.size(); i++) {
+            if (m) {
+                if (i == mNB)
+                    break;
+            }
+
             Object lineNumt = ti.get(i).get(0);
             String s = (String) lineNumt;
             int lineNum = Integer.parseInt(s);
@@ -302,18 +324,18 @@ public class RegEx {
 
             nbWordsMatch += ti.get(i).size();
 
-            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") +
+            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") +
                     ANSI_RESET +
-                            line.substring(0, index - 1) +
-                            RED +
-                            (index > 0 ? line.substring(index - 1, index + reg.length() - 1) : "")
-                            + ANSI_RESET +
-                            ((index + reg.length() - 1) > line.length() ? line.substring(index + reg.length() - 1, line.length()) : ""));
+                    line.substring(0, index - 1) +
+                    RED +
+                    (index > 0 ? line.substring(index - 1, index + reg.length() - 1) : "")
+                    + ANSI_RESET +
+                    ((index + reg.length() - 1) > line.length() ? line.substring(index + reg.length() - 1, line.length()) : ""));
 
-            if(c)
+            if (c)
                 System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
 
-            if(y)
+            if (y)
                 System.out.println("Nombre de ligne où un motif à été trouver : " + RED + ti.size() + RESET);
 
 
@@ -325,10 +347,14 @@ public class RegEx {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
+            if (m) {
+                if (i == mNB)
+                    break;
+            }
 
             String line = lines.get(ti.get(i).get(0) - 1);
 
-            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") + ANSI_RESET +
+            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") + ANSI_RESET +
                     (ti.get(i).get(1) > 1 ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                     RED +
                     line.substring(ti.get(i).get(1) - 1, ti.get(i).get(1) + reg.length() - 1) +
@@ -343,8 +369,8 @@ public class RegEx {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[42m";
         for (int i = 0; i < ti.size(); i++) {
-            if(m){
-                if(i==mNB)
+            if (m) {
+                if (i == mNB)
                     break;
             }
 
@@ -356,12 +382,12 @@ public class RegEx {
             if (END)
                 line = line.replace("$", "");
 
-            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") +
+            System.out.println((n ? BLUE_BOLD + i + ":" + RESET : "") +
                     (((ti.get(i).get(1) > 1) && !o) ? line.substring(0, ti.get(i).get(1) - 1) : "") +
-                            RED +
-                            line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
-                            ANSI_RESET +
-                            ((line.length() > (ti.get(i).get(2)-1) && !o) ? line.substring(ti.get(i).get(2)-1, line.length()) : ""));
+                    RED +
+                    line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
+                    ANSI_RESET +
+                    ((line.length() > (ti.get(i).get(2) - 1) && !o) ? line.substring(ti.get(i).get(2) - 1, line.length()) : ""));
         }
     }
 
@@ -669,7 +695,6 @@ public class RegEx {
         return new RegExTree(ALTERN, subTrees);
     }
 }
-
 
 
 // UTILITARY CLASS
