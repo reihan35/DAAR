@@ -39,6 +39,8 @@ public class RegEx {
     public static boolean m = false;
     public static int mNB = 0;
     public static boolean o = false;
+    public static boolean n = false;
+    public static boolean y = false;
 
     // CONSTRUCTOR
     public RegEx() {
@@ -66,6 +68,12 @@ public class RegEx {
             System.out.println(" >> regEx : " + regEx);
             System.out.println(" >> option : " + option);
             System.out.println(" >> file name : " + fileName);
+
+            // option h: help
+            if (option.contains("h")) {
+                System.err.println("Consulter le manuelle d'utilisation");
+                return;
+            }
 
             // option l :
             if (option.contains("l")) {
@@ -99,6 +107,17 @@ public class RegEx {
             if (option.contains("w")) {
                 w = true;
             }
+
+            // option n: affiche les id des ligne + l'affichage par defaut
+            if (option.contains("n")) {
+                n = true;
+            }
+
+            // option y: affiche le nombre de ligne où y a correspondance
+            if (option.contains("y")) {
+                y = true;
+            }
+
 
         }
         if (regEx.length() < 1) {
@@ -140,8 +159,9 @@ public class RegEx {
 
                     if (isRegex(regEx)) {
                         ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
-                        if(c)
+                        if(c || y)
                             return;
+
                         printWordsInColorM1(lines, result, BEG, END);
                     }
                 } else {
@@ -184,6 +204,7 @@ public class RegEx {
 
         int i = 0;
         int nbWordsMatch = 0;
+        int nbLinessMatch = 0;
 
         for (String line : lines) {
             i++;
@@ -193,9 +214,13 @@ public class RegEx {
                 result.addAll(matching);
 
             nbWordsMatch += matching.size();
+            nbLinessMatch++;
         }
         if(c)
             System.out.println("Nombre de motif qui match: " + RED + nbWordsMatch + RESET);
+
+        if(y)
+            System.out.println("Nombre de ligne où un motif à été trouver : " + RED + nbLinessMatch + RESET);
         return result;
     }
 
@@ -300,7 +325,7 @@ public class RegEx {
             if (END)
                 line = line.replace("$", "");
 
-            System.out.println(
+            System.out.println((n? BLUE_BOLD + i + ":" + RESET :"") +
                     (((ti.get(i).get(1) > 1) && !o) ? line.substring(0, ti.get(i).get(1) - 1) : "") +
                             RED +
                             line.substring(ti.get(i).get(1) - 1, ti.get(i).get(2) - 1) +
