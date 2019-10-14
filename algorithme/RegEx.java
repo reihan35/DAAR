@@ -101,7 +101,9 @@ public class RegEx {
             if (option.contains("o")) {
                 o = true;
             }
-            // return;
+            if (option.contains("w")) {
+                w = true;
+            }
 
         }
         if (regEx.length() < 1) {
@@ -115,8 +117,6 @@ public class RegEx {
             regEx = regEx.substring(1, regEx.length() - 1);
             allChar = true;
         }
-        System.out.println("1 regEx : " + regEx);
-
 
         if (regEx.length() < 1) {
             System.err.println("  >> ERROR: empty regEx.");
@@ -138,35 +138,22 @@ public class RegEx {
 
                 File file = new File(fileName);
                 if (isRegex(regEx)) {
-                    System.out.println("....Method1.....");
                     RegExTree ret = parse(allChar);
                     NFA n = ret.toAutomaton();
-                    // n.print();
                     DFA d = n.to_DFA();
                     d.print();
                     // d.minDFA();
 
                     if (isRegex(regEx)) {
-
-                        // la methode est plus rapide
-                        System.out.println("....ELSE.....");
                         ArrayList<ArrayList<Integer>> result = mainM1(lines, d, regEx);
-                        System.out.println("....ELSE....." + result.size());
-
                         if(c)
                             return;
                         printWordsInColorM1(lines, result, BEG, END);
                     }
                 } else {
                     // method 3
-                    Scanner myObj = new Scanner(System.in);
-                    System.out.println("Est-ce qu'il est important pour vous de voir aussi les mots où votre motif est suffixe ou milieu ?");
-                    System.out.println("Exemple : Le motif jour dans bonjour et bonnejournée");
-                    System.out.println("Tapez 1 pour oui 0 pour non.");
-                    int rep = myObj.nextInt();
-                    if (rep == 0) {
-                        System.out.println("1 ....Method3.....");
-                        File cache = new File("cache_" + fileName);
+                    if (w) {
+                        File cache = new File(fileName + "_cache" );
                         if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
                             System.out.println(" 2 ....Method3.....");
                             if (!cache.exists()) {

@@ -31,7 +31,7 @@ public class Indexing{
     //Cette fonction prend en entree la liste des mots du texte l'ordonne en ordre corissant et ecrit le résultat dans fichier qui sera le cache
     public static void makeCash(ArrayList<String> s, String filename) throws Exception{
         HashMap<String,ArrayList<ArrayList<Integer>>> occurences = toHashMap(s);
-        PrintWriter writer = new PrintWriter("cache_" + filename, "UTF-8");
+        PrintWriter writer = new PrintWriter(filename + "_cache" , "UTF-8");
         
         List ListofKeys = new ArrayList(sortByValue(toHashInt(s)).keySet());
         for (int i=0; i<ListofKeys.size();i++){
