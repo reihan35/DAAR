@@ -55,19 +55,11 @@ public class RegEx {
         } else if (arg.length == 2) {
             regEx = arg[0];
             fileName = arg[1];
+            System.out.println(" >> regEx : " + regEx);
             System.out.println(" >> file name : " + fileName);
-            System.out.println("regEx : " + regEx);
-
-            if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
-                System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
-                regEx = regEx.substring(1, regEx.length() - 1);
-                allChar = true;
-            }
-            System.out.println("1 regEx : " + regEx);
-
+            
         } else if (arg.length == 3) {
-            // daar [OPTIONS] PATTERN [FILE]
-            System.out.println("nb arg 3 ");
+            // RegEx [OPTIONS] PATTERN [FILE]
             option = arg[0];
             regEx = arg[1];
             fileName = arg[2];
@@ -75,32 +67,35 @@ public class RegEx {
             System.out.println(" >> option : " + option);
             System.out.println(" >> file name : " + fileName);
 
-            // ok 1.option l :
+            // option l :
             if (option.contains("l")) {
                 System.out.println("File name : " + PURPLE_BOLD + fileName);
                 return;
             }
 
-            // OK option i; Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée
+            // option i; Ignorer les distinctions de casse dans les fichiers PATTERN et le fichier d'entrée
             if (option.contains("i")) {
                 regEx = regEx.toLowerCase();
                 i = true;
             }
 
-            // OK option c: Supprimer la sortie normale; à la place, imprimez le nombre de ligne de correspondantes
+            // option c: Supprimer la sortie normale; à la place, imprimez le nombre de ligne de correspondantes
             if (option.contains("c"))
                 c = true;
 
+            //  optionm[n : nb ligne] : arrete l'affichage des linge matcher à la n-ème ligne
             if (option.contains("m")) {
                 m = true;
                 String[] options = option.split("m");
                 mNB = Integer.parseInt(options[1]);
             }
 
-            // (KO) option o : print que les matching trouver
+            // option o : print que les matching trouver
             if (option.contains("o")) {
                 o = true;
             }
+
+            // option w: affiche que le mot complet matcher
             if (option.contains("w")) {
                 w = true;
             }
@@ -113,7 +108,6 @@ public class RegEx {
         boolean END = false;
 
         if (regEx.charAt(0) == '`' && regEx.charAt(regEx.length() - 1) == '`') {
-            System.out.println(" >> je suis dans le truc : " + regEx.substring(1, regEx.length() - 1));
             regEx = regEx.substring(1, regEx.length() - 1);
             allChar = true;
         }
@@ -151,11 +145,10 @@ public class RegEx {
                         printWordsInColorM1(lines, result, BEG, END);
                     }
                 } else {
-                    // method 3
                     if (w) {
                         File cache = new File(fileName + "_cache" );
                         if (Indexing.toHashInt(Indexing.FileToStrings(file)).get(regEx) != null) {
-                            System.out.println(" 2 ....Method3.....");
+                            // method 3
                             if (!cache.exists()) {
                                 try {
                                     Indexing.makeCash(Indexing.FileToStrings(file), fileName);
@@ -227,8 +220,10 @@ public class RegEx {
 
     }
 
-    //Cette fonction renvoie la liste des lignes d'un fichier
     public static ArrayList<String> FileToStrings(File fileName) {
+        /**
+         * Cette fonction renvoie la liste des lignes d'un fichier
+         */
         try {
             String line = null;
             FileReader fileReader = new FileReader(fileName);
@@ -371,7 +366,6 @@ public class RegEx {
             Scanner scanner = new Scanner(new File(file));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                // System.out.println("line: " + line);
                 search.searchWithDFA(d, line, regEx, 0, 0);
             }
         } catch (Exception e) {
@@ -400,7 +394,6 @@ public class RegEx {
             boolean ignore = false;
 
             if (regEx.charAt(i) == '\\') {
-                System.out.println(">>>>>>>>>>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! .......................");
                 ignore = true;
                 i++;
             }
